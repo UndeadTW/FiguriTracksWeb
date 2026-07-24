@@ -77,6 +77,42 @@
             z-index: -1; pointer-events: none;
         }
 
+        /* PANTALLA DE CARGA */
+        #loading-screen {
+            position: fixed;
+            inset: 0;
+            background: #000;
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            transition: opacity 2s ease, visibility 2s ease;
+        }
+        
+        #loading-screen.fade-out {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        #intro-video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+
+        #start-btn-container {
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
         .bg-glow {
             position: fixed; border-radius: 50%; filter: blur(140px); z-index: -1;
             opacity: var(--glow-opacity); animation: float 10s infinite alternate ease-in-out; transition: opacity 0.4s ease;
@@ -298,6 +334,18 @@
     </style>
 </head>
 <body>
+
+    <!-- PANTALLA DE CARGA -->
+    <div id="loading-screen">
+        <div id="start-btn-container">
+            <h1 style="color: white; font-weight: 900; font-size: 2rem;">ÁLBUM MUNDIAL 2026</h1>
+            <button id="start-intro-btn" class="btn btn-pack" style="font-size: 1.2rem; padding: 1rem 2rem;">Ingresar</button>
+        </div>
+        <video id="intro-video" playsinline>
+            <source src="audio/FWC.mp4" type="video/mp4">
+        </video>
+    </div>
+
     <div class="bg-glow glow-1"></div><div class="bg-glow glow-2"></div><div class="bg-glow glow-3"></div>
 
     <header class="header">
@@ -451,6 +499,31 @@
     </footer>
 
     <script>
+        // --- LÓGICA DE PANTALLA DE CARGA ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const loadingScreen = document.getElementById('loading-screen');
+            const startBtnContainer = document.getElementById('start-btn-container');
+            const startBtn = document.getElementById('start-intro-btn');
+            const introVideo = document.getElementById('intro-video');
+
+            startBtn.addEventListener('click', () => {
+                startBtnContainer.style.display = 'none';
+                introVideo.style.display = 'block';
+                introVideo.play();
+            });
+
+            introVideo.addEventListener('ended', () => {
+                // Inicia el degradado de 2 segundos definido en el CSS
+                loadingScreen.classList.add('fade-out');
+                
+                // Remueve el contenedor del DOM una vez terminada la transición
+                setTimeout(() => {
+                    loadingScreen.style.display = 'none';
+                }, 2000); 
+            });
+        });
+
+        // --- RESTO DEL CÓDIGO ORIGINAL ---
         const themeToggle = document.getElementById('theme-toggle');
         const storedTheme = localStorage.getItem('album-theme') || 'dark';
 
@@ -627,7 +700,6 @@
                 }
             }
 
-            // --- HELPER DE CRONOMETRO VIVO ---
             startCountdown(duration, textElement, onComplete, isMatch=false) {
                 if(this.countdownInterval) clearInterval(this.countdownInterval);
                 let startTime = Date.now();
@@ -652,7 +724,6 @@
                 }, 30);
             }
 
-            // --- PESTAÑAS DE MINIJUEGOS ---
             switchPredTab(tab) {
                 document.getElementById('tab-btn-penal').classList.remove('active');
                 document.getElementById('tab-btn-partido').classList.remove('active');
@@ -686,7 +757,6 @@
                 document.getElementById('prediction-modal').classList.add('active');
             }
 
-            // --- JUEGO 1: PENALES ---
             playPenalty(userPrediction) {
                 document.getElementById('pred-step-1').classList.add('hidden');
                 document.getElementById('pred-step-2').classList.remove('hidden');
@@ -702,7 +772,6 @@
                 void ball.offsetWidth;
 
                 this.startCountdown(5000, resultText, () => {
-                    // Acción al terminar 5 segundos
                     audioSilbato.play().catch(e=>console.log(e));
                     
                     if (isGol) {
@@ -743,7 +812,6 @@
                 }, false);
             }
 
-            // --- JUEGO 2: PARTIDO 2D ---
             initPitch() {
                 const pitch = document.getElementById('pitch-container');
                 pitch.querySelectorAll('.match-dot').forEach(el => el.remove());
@@ -796,7 +864,6 @@
 
                 let startTime = Date.now();
                 
-                // Lógica de Movimiento Interactivo del partido (cada 300ms para suavidad)
                 this.matchInterval = setInterval(() => {
                     let elapsed = Date.now() - startTime;
                     let ball = this.matchDots[0];
@@ -825,7 +892,6 @@
                     });
                 }, 300);
 
-                // Arrancar timer visual
                 this.startCountdown(10000, resText, () => {
                     clearInterval(this.matchInterval);
                     audioHinchada.pause();
@@ -878,7 +944,6 @@
                 }
             }
 
-            // --- ABRIR SOBRES ---
             async openPackModal(amount = 5) {
                 const modal = document.getElementById('pack-modal');
                 const container = document.getElementById('pack-cards');
