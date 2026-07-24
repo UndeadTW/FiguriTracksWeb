@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-width=1.0">
+    <title>Gestor Álbum Mundial 2026</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --wc-purple: #4A00E0;
+            --wc-pink: #FF005B;
+            --wc-green: #00FF87;
+            --wc-blue: #00E5FF;
+            --wc-yellow: #FFE600;
+
+            --wc-dark: #040406;
+            --wc-panel: rgba(20, 21, 28, 0.88);
+            --wc-border: rgba(255, 255, 255, 0.08);
+            --text-main: #FFFFFF;
+            --text-muted: #A6A6AF;
+            --text-logo: #FFFFFF;
+            --shadow-soft: 0 12px 30px rgba(0, 0, 0, 0.24);
+            
+            --header-bg: rgba(14, 15, 21, 0.94);
+            --card-bg: rgba(17, 18, 24, 0.95);
+            --modal-bg: linear-gradient(180deg, rgba(12, 13, 21, 0.96), rgba(6, 7, 12, 0.96));
+            --stats-bg: linear-gradient(180deg, rgba(17, 19, 31, 0.88), rgba(8, 9, 16, 0.84));
+            --sticker-bg: #151520;
+            --pack-bg: #1a1a24;
+            --footer-bg: rgba(9, 10, 14, 0.96);
+            --btn-bg: rgba(255,255,255,0.04);
+            --btn-hover: rgba(255,255,255,0.1);
+            --body-overlay: linear-gradient(rgba(4, 4, 6, 0.58), rgba(4, 4, 6, 0.66));
+            --glow-opacity: 0.22;
+        }
+
+        [data-theme="light"] {
+            --wc-dark: #f0f2f5;
+            --wc-panel: rgba(255, 255, 255, 0.88);
+            --wc-border: rgba(0, 0, 0, 0.12);
+            --text-main: #1a1a24;
+            --text-muted: #6b6b7b;
+            --text-logo: #0a0a0f;
+            --shadow-soft: 0 12px 30px rgba(0, 0, 0, 0.08);
+            
+            --header-bg: rgba(255, 255, 255, 0.94);
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --modal-bg: linear-gradient(180deg, rgba(245, 247, 250, 0.96), rgba(255, 255, 255, 0.96));
+            --stats-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(240, 242, 245, 0.84));
+            --sticker-bg: #e4e6eb;
+            --pack-bg: #ffffff;
+            --footer-bg: rgba(240, 242, 245, 0.96);
+            --btn-bg: rgba(0,0,0,0.04);
+            --btn-hover: rgba(0,0,0,0.08);
+            --body-overlay: linear-gradient(rgba(240, 242, 245, 0.85), rgba(255, 255, 255, 0.9));
+            --glow-opacity: 0.4;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Montserrat', sans-serif; }
+
+        body {
+            background-color: var(--wc-dark); color: var(--text-main); min-height: 100vh;
+            display: flex; flex-direction: column; overflow-x: hidden; position: relative; isolation: isolate;
+            transition: background-color 0.4s ease, color 0.4s ease;
+        }
+
+        body::before {
+            content: ''; position: fixed; inset: 0;
+            background: var(--body-overlay), url('./fifa-unveils-official-brand-for-2026-fifa-world-cup-header-image.avif') center center / cover no-repeat;
+            z-index: -2; filter: saturate(1) contrast(1.03) brightness(0.9); transform: scale(1.05); transition: background 0.4s ease;
+        }
+
+        body::after {
+            content: ''; position: fixed; inset: 0;
+            background: radial-gradient(circle at top left, rgba(74, 0, 224, 0.28), transparent 32%),
+                        radial-gradient(circle at bottom right, rgba(255, 0, 91, 0.24), transparent 35%);
+            z-index: -1; pointer-events: none;
+        }
+
+        .bg-glow {
+            position: fixed; border-radius: 50%; filter: blur(140px); z-index: -1;
+            opacity: var(--glow-opacity); animation: float 10s infinite alternate ease-in-out; transition: opacity 0.4s ease;
+        }
+        .glow-1 { top: -10%; left: -10%; width: 40vw; height: 40vw; background: var(--wc-purple); }
+        .glow-2 { bottom: -10%; right: -10%; width: 50vw; height: 50vw; background: var(--wc-pink); animation-delay: -5s; }
+        .glow-3 { top: 40%; left: 60%; width: 30vw; height: 30vw; background: var(--wc-green); animation-delay: -2s; opacity: calc(var(--glow-opacity) * 0.7);}
+
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(20px, 30px) scale(1.1); }
+        }
+
+        .header {
+            background: var(--header-bg); backdrop-filter: blur(14px); border-bottom: 1px solid var(--wc-border);
+            padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 0; z-index: 100; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1); flex-wrap: wrap; gap: 1rem;
+        }
+
+        .brand { display: flex; align-items: center; gap: 1rem; }
+        .trophy-logo { width: 78px; height: auto; display: block; filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.35)); }
+        .brand-text h1 { font-size: 1.2rem; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; color: var(--text-logo); }
+        .brand-text span { font-size: 0.8rem; color: var(--text-muted); font-weight: 700; letter-spacing: 4px; }
+        .header-right { display: flex; align-items: center; gap: 2rem; flex-wrap: wrap; }
+        .stats-overview { display: flex; gap: 2rem; }
+        .stat-box { display: flex; flex-direction: column; align-items: flex-end; }
+        .stat-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
+        .stat-value { font-size: 1.4rem; font-weight: 900; color: var(--text-logo); }
+        .val-progress { color: var(--wc-green) !important; }
+        .val-rep { color: var(--wc-blue) !important; }
+
+        .container { flex: 1; max-width: 1300px; margin: 0 auto; padding: 2rem; width: 100%; }
+
+        .controls { display: flex; gap: 1rem; margin-bottom: 3rem; flex-wrap: wrap; justify-content: center; }
+        .btn {
+            padding: 0.9rem 1.4rem; border: 1px solid var(--wc-border); border-radius: 14px; font-weight: 800; font-size: 0.95rem;
+            text-transform: uppercase; letter-spacing: 1px; cursor: pointer; transition: all 0.25s ease; color: var(--text-logo);
+            position: relative; overflow: hidden; z-index: 1; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1); background: var(--btn-bg);
+        }
+        .btn-theme { padding: 0.6rem 1.2rem; font-size: 0.8rem; border-radius: 50px; }
+        .btn::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: var(--btn-hover);
+            z-index: -1; transition: opacity 0.3s; opacity: 0;
+        }
+        .btn:hover::before { opacity: 1; }
+        .btn:hover { transform: translateY(-3px); }
+
+        .btn-pack { background: linear-gradient(135deg, rgba(74, 0, 224, 0.78), rgba(255, 0, 91, 0.8)); color: #ffffff; border-color: rgba(255,255,255,0.14); }
+        .btn-predict { background: linear-gradient(135deg, rgba(0, 255, 135, 0.6), rgba(0, 229, 255, 0.7)); color: #040406; border-color: rgba(255,255,255,0.2); }
+        .btn-danger { background: rgba(255, 0, 91, 0.05); border: 1px solid rgba(255, 0, 91, 0.5); color: var(--wc-pink); }
+        .btn-azul { background: linear-gradient(135deg, #00E5FF, #007BFF); color: #000; border: none; }
+        .btn-rojo { background: linear-gradient(135deg, #FF005B, #D50000); color: #FFF; border: none; }
+
+        .section-title { font-size: 2rem; font-weight: 900; margin-bottom: 2rem; text-transform: uppercase; letter-spacing: 2px; text-align: center; position: relative; color: var(--text-logo); }
+        .section-title::after { content: ''; position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); width: 60px; height: 4px; background: var(--wc-green); border-radius: 2px; }
+
+        .groups-grid, .ranking-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; }
+        .team-card {
+            background: var(--card-bg); border: 1px solid var(--wc-border); border-radius: 16px; padding: 1.4rem; cursor: pointer;
+            transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease, background 0.4s ease;
+            position: relative; backdrop-filter: blur(10px); box-shadow: var(--shadow-soft);
+        }
+        .team-card:hover { transform: translateY(-4px); border-color: var(--wc-purple); box-shadow: 0 14px 34px rgba(0, 0, 0, 0.15); }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .card-header h3 { font-size: 1.3rem; font-weight: 900; color: var(--text-logo); }
+        .card-code { background: var(--wc-border); padding: 4px 8px; border-radius: 6px; font-size: 0.8rem; font-weight: 700; color: var(--text-logo); }
+        .group-badge { display: inline-block; font-size: 0.7rem; font-weight: 900; text-transform: uppercase; color: var(--wc-yellow); margin-bottom: 0.5rem; }
+        
+        .progress-bar-container { width: 100%; height: 8px; background: rgba(0,0,0,0.15); border-radius: 4px; overflow: hidden; margin: 1rem 0 0.5rem; }
+        [data-theme="dark"] .progress-bar-container { background: rgba(0,0,0,0.5); }
+        .progress-bar { height: 100%; background: linear-gradient(90deg, #7c3aed, #a78bfa); width: 0%; transition: width 0.8s ease; }
+        .progress-text { text-align: right; font-size: 0.9rem; font-weight: 700; color: var(--text-muted); }
+
+        .modal {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px);
+            display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+        }
+        .modal.active { opacity: 1; pointer-events: all; }
+        .modal-content {
+            background: var(--modal-bg); border: 1px solid var(--wc-border); border-radius: 24px; padding: 2.5rem; width: 90%; max-width: 900px;
+            max-height: 90vh; overflow-y: auto; position: relative; box-shadow: 0 30px 60px rgba(0,0,0,0.4); transform: scale(0.95);
+            transition: transform 0.3s, background 0.4s ease; color: var(--text-logo);
+        }
+        .modal.active .modal-content { transform: scale(1); }
+        .close-btn {
+            position: absolute; top: 1.5rem; right: 1.5rem; background: var(--btn-bg); border: 1px solid var(--wc-border);
+            color: var(--text-logo); width: 40px; height: 40px; border-radius: 50%; font-size: 1.5rem; cursor: pointer; display: flex; justify-content: center; align-items: center;
+            z-index: 2000;
+        }
+        .close-btn:hover { background: var(--wc-pink); color: #fff; }
+
+        .team-stats-modal {
+            display: flex; align-items: center; gap: 1.5rem; margin: 1.5rem 0 2.5rem; padding: 1rem;
+            background: var(--stats-bg); border: 1px solid var(--wc-border); border-radius: 14px; box-shadow: var(--shadow-soft);
+        }
+
+        .stickers-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(65px, 1fr)); gap: 1rem; }
+        .sticker {
+            aspect-ratio: 3/4; border-radius: 8px; display: flex; flex-direction: column; justify-content: center; align-items: center;
+            font-weight: 900; font-size: 1.2rem; cursor: pointer; user-select: none; transition: all 0.2s ease; position: relative;
+            background: var(--sticker-bg); border: 2px solid var(--wc-border); color: var(--text-muted); overflow: hidden;
+        }
+        .sticker img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.15; transition: opacity 0.3s; }
+        .sticker.st-1 img { opacity: 1; }
+        .sticker.st-rep img { opacity: 1; filter: grayscale(50%) sepia(50%) hue-rotate(180deg); }
+        .sticker.st-1 { background: rgba(0, 255, 135, 0.1); color: var(--wc-green) !important; border-color: var(--wc-green); box-shadow: 0 0 15px rgba(0, 255, 135, 0.2); }
+        .sticker.st-rep { background: rgba(0, 229, 255, 0.1); color: var(--wc-blue) !important; border-color: var(--wc-blue); }
+        .sticker-badge { position: absolute; top: -5px; right: -5px; background: var(--wc-blue); color: #000; font-size: 0.75rem; padding: 3px 6px; border-radius: 12px; font-weight: 900; z-index: 2;}
+        .sticker-num { position: absolute; z-index: 1; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
+        .sticker.st-1 .sticker-num, .sticker.st-rep .sticker-num { display: none; }
+        .sticker:hover { transform: translateY(-5px); border-color: var(--wc-purple); }
+
+        .pack-panel { text-align: center; background: radial-gradient(circle at top, rgba(74, 0, 224, 0.14), transparent 38%), var(--modal-bg); border: 1px solid var(--wc-border); border-radius: 20px; padding: 2rem; }
+        .pack-title { font-size: 2.5rem; font-weight: 900; text-transform: uppercase; color: var(--wc-yellow); margin-bottom: 2rem; letter-spacing: 2px; }
+        .pack-cards { display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap; margin: 2rem 0; min-height: 250px; perspective: 1000px; }
+        
+        .pack-card {
+            width: 140px; height: 200px; background: var(--pack-bg); border: 2px solid var(--wc-border); border-radius: 12px;
+            display: flex; flex-direction: column; justify-content: center; align-items: center; opacity: 0;
+            transform: translateY(100px) rotateY(180deg) scale(0.8); transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275); position: relative; overflow: hidden;
+        }
+        .pack-card::after {
+            content: ''; position: absolute; width: 65%; height: 65%; background-image: url('./logo copa.png'); background-size: contain; background-repeat: no-repeat; background-position: center; opacity: 0.12; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 0; pointer-events: none; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+        }
+        .pack-card > * { z-index: 1; }
+        .pack-card.revealed { opacity: 1; transform: translateY(0) rotateY(0) scale(1); }
+        .pack-card.new { border-color: var(--wc-green); background: radial-gradient(circle at top, rgba(0, 255, 135, 0.2), var(--pack-bg)); box-shadow: 0 0 30px rgba(0, 255, 135, 0.3); }
+        .pack-card.rep { border-color: var(--wc-blue); background: radial-gradient(circle at top, rgba(0, 229, 255, 0.2), var(--pack-bg)); box-shadow: 0 0 30px rgba(0, 229, 255, 0.3); }
+
+        .pack-img { width: 100%; height: 100%; object-fit: cover; position: absolute; top:0; left:0; z-index: 0; }
+        .pack-fallback { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 1; background: transparent; }
+        .pack-footer { position: absolute; bottom: 0; width: 100%; padding: 10px; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); z-index: 2; display: flex; justify-content: space-between; align-items: center; }
+        
+        .card-team { font-size: 1.2rem; font-weight: 900; color: #fff; }
+        .card-status { font-size: 0.7rem; font-weight: 900; padding: 4px 8px; border-radius: 6px; text-transform: uppercase; }
+        .status-new { background: var(--wc-green); color: #040406; }
+        .status-rep { background: var(--wc-blue); color: #040406; }
+
+        /* PREDICTION ANIMATION & TABS */
+        .tabs { display: flex; justify-content: center; gap: 1rem; margin-bottom: 1.5rem; }
+        .tab-btn { background: rgba(255,255,255,0.05); border: 2px solid transparent; color: var(--text-logo); padding: 0.8rem 1.5rem; border-radius: 12px; font-weight: 800; cursor: pointer; transition: all 0.3s; }
+        .tab-btn.active { border-color: var(--wc-green); background: rgba(0, 255, 135, 0.1); }
+
+        .timer-text { font-family: monospace; letter-spacing: 1px; color: var(--wc-yellow); font-size: 1.8rem;}
+
+        .penalty-container {
+            position: relative; width: 100%; max-width: 400px; height: 250px; margin: 0 auto 2rem;
+            background: linear-gradient(180deg, rgba(0,0,0,0.1), rgba(0, 255, 135, 0.2));
+            border: 2px solid rgba(255,255,255,0.1); border-bottom: 4px solid var(--wc-green); border-radius: 12px 12px 0 0; overflow: hidden;
+        }
+        
+        .goal-net {
+            position: absolute; top: 30px; left: 50%; transform: translateX(-50%); width: 180px; height: 80px;
+            border: 4px solid #fff; border-bottom: none;
+            background-image: linear-gradient(45deg, rgba(255,255,255,0.6) 25%, transparent 25%, transparent 75%, rgba(255,255,255,0.6) 75%, rgba(255,255,255,0.6)),
+                              linear-gradient(45deg, rgba(255,255,255,0.6) 25%, transparent 25%, transparent 75%, rgba(255,255,255,0.6) 75%, rgba(255,255,255,0.6));
+            background-size: 14px 14px; background-position: 0 0, 7px 7px;
+        }
+
+        .anim-gk { position: absolute; top: 70px; left: 50%; transform: translateX(-50%); font-size: 3rem; transition: all 1.2s ease-out; z-index: 2; }
+        .anim-ball { position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); font-size: 2.5rem; transition: all 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 3; filter: drop-shadow(0 5px 5px rgba(0,0,0,0.5)); }
+
+        .animating-ball-gol { bottom: 150px !important; left: 55% !important; transform: translateX(-50%) rotate(720deg) scale(0.6) !important; }
+        .animating-gk-gol { left: 25% !important; transform: translateX(-50%) rotate(-45deg) !important; }
+        .animating-ball-atajada { bottom: 110px !important; left: 35% !important; transform: translateX(-50%) rotate(360deg) scale(0.7) !important; }
+        .animating-gk-atajada { left: 35% !important; top: 80px !important; transform: translateX(-50%) rotate(-30deg) scale(1.1) !important; }
+
+        /* PARTIDO 2D */
+        .scoreboard { font-size: 2.5rem; font-weight: 900; margin-bottom: 1rem; color: var(--text-logo); }
+        .score-azul { color: #00E5FF; }
+        .score-rojo { color: #FF005B; }
+        
+        .pitch-container {
+            position: relative; width: 100%; max-width: 500px; height: 280px; margin: 0 auto 2rem;
+            background: #2E7D32; border: 4px solid rgba(255,255,255,0.8); border-radius: 8px; overflow: hidden;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+        }
+        .pitch-line { position: absolute; left: 50%; top: 0; bottom: 0; width: 4px; background: rgba(255,255,255,0.8); transform: translateX(-50%); }
+        .pitch-circle { position: absolute; left: 50%; top: 50%; width: 80px; height: 80px; border: 4px solid rgba(255,255,255,0.8); border-radius: 50%; transform: translate(-50%, -50%); }
+        .pitch-goal-left { position: absolute; left: -4px; top: 50%; width: 30px; height: 80px; border: 4px solid rgba(255,255,255,0.8); transform: translateY(-50%); }
+        .pitch-goal-right { position: absolute; right: -4px; top: 50%; width: 30px; height: 80px; border: 4px solid rgba(255,255,255,0.8); transform: translateY(-50%); }
+
+        .match-dot { position: absolute; width: 14px; height: 14px; border-radius: 50%; transition: all 0.3s linear; transform: translate(-50%, -50%); }
+        .dot-blue { background: #00E5FF; box-shadow: 0 0 5px #00E5FF; z-index: 2; }
+        .dot-red { background: #FF005B; box-shadow: 0 0 5px #FF005B; z-index: 2; }
+        .dot-ball { background: white; width: 10px; height: 10px; z-index: 10; box-shadow: 0 0 5px black; }
+
+        .flash-text {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0);
+            font-size: 3rem; font-weight: 900; opacity: 0; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            pointer-events: none; z-index: 20; text-shadow: 0 4px 15px rgba(0,0,0,0.8);
+        }
+        .flash-text.active { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+
+        /* GOOOOL Overlay */
+        .gol-overlay {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0);
+            font-size: 3.5rem; font-weight: 900; color: #FFF; text-shadow: 0 0 10px #43A1D5, 0 0 20px #43A1D5, 0 0 40px #FFFFFF;
+            opacity: 0; z-index: 30; transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); pointer-events: none;
+        }
+        .gol-overlay.active { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+
+        .confetti { position: absolute; top: -20px; width: 10px; height: 20px; z-index: 100; animation: fall 3s linear forwards; opacity: 0.8; }
+        @keyframes fall { to { transform: translateY(100vh) rotate(720deg); } }
+
+        /* HISTORIAL */
+        .history-list { max-height: 400px; overflow-y: auto; text-align: left; margin-top: 1rem; background: rgba(0,0,0,0.2); border-radius: 10px; padding: 1rem; }
+        .history-item { padding: 0.8rem; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.9rem; display: flex; justify-content: space-between; }
+        .history-item:last-child { border-bottom: none; }
+        .hist-date { color: var(--text-muted); font-size: 0.8rem; }
+        .hist-action { font-weight: 700; color: var(--text-logo); }
+
+        footer { text-align: center; padding: 1.25rem 2rem; color: var(--text-muted); font-size: 0.9rem; border-top: 1px solid var(--wc-border); margin-top: auto; background: var(--footer-bg); }
+        .hidden { display: none !important; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--wc-dark); }
+        ::-webkit-scrollbar-thumb { background: var(--wc-purple); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--wc-pink); }
+    </style>
+</head>
+<body>
+    <div class="bg-glow glow-1"></div><div class="bg-glow glow-2"></div><div class="bg-glow glow-3"></div>
+
+    <header class="header">
+        <div class="brand">
+            <img class="trophy-logo" src="./logo copa.png" alt="Logo WC">
+            <div class="brand-text">
+                <h1>Fifa World Cup</h1>
+                <span>GESTOR OFICIAL</span>
+            </div>
+        </div>
+        <div class="header-right">
+            <button id="theme-toggle" class="btn btn-theme">☀️ Oscuro</button>
+            <div class="stats-overview">
+                <div class="stat-box"><span class="stat-label">Progreso</span><span class="stat-value val-progress" id="global-progress">0%</span></div>
+                <div class="stat-box"><span class="stat-label">Figuritas</span><span class="stat-value" id="global-count">0 / 980</span></div>
+                <div class="stat-box"><span class="stat-label">Repetidas</span><span class="stat-value val-rep" id="global-rep">0</span></div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="controls">
+            <button class="btn btn-predict" onclick="app.openPredictionModal()">⚽ Minijuegos</button>
+            <button class="btn btn-pack" onclick="app.openPackModal(5)">📦 Abrir Sobre</button>
+            <button class="btn btn-rank" onclick="app.showRanking()">🏆 Ranking</button>
+            <button class="btn btn-rank" onclick="app.openHistoryModal()">📄 Historial</button>
+            <button class="btn btn-danger" onclick="app.resetAlbum()">🗑️ Borrar Progreso</button>
+        </div>
+
+        <section id="ranking-section" class="hidden">
+            <h2 class="section-title">Top 10 Selecciones</h2>
+            <div id="ranking-list" class="ranking-grid"></div>
+        </section>
+
+        <section id="groups-section">
+            <h2 class="section-title">Equipos por Grupos</h2>
+            <div id="groups-grid" class="groups-grid"></div>
+        </section>
+    </main>
+
+    <!-- Modal Prediction & Minigames -->
+    <div id="prediction-modal" class="modal">
+        <div class="modal-content pack-panel" style="max-width: 650px; position: relative;">
+            <button class="close-btn" onclick="app.closeModal('prediction-modal')" style="z-index: 200;">×</button>
+            
+            <div class="tabs">
+                <button class="tab-btn active" id="tab-btn-penal" onclick="app.switchPredTab('penal')">🥅 Penales</button>
+                <button class="tab-btn" id="tab-btn-partido" onclick="app.switchPredTab('partido')">🏟️ Partido 2D</button>
+            </div>
+
+            <div class="gol-overlay" id="gol-overlay">¡GOOOOL!</div>
+
+            <!-- TANDA DE PENALES -->
+            <div id="tab-penal">
+                <h2 class="pack-title" style="color: var(--wc-green); margin-top: 1rem;">PENAL DECISIVO</h2>
+                
+                <div class="penalty-container" id="penalty-container">
+                    <div class="goal-net"></div>
+                    <div class="anim-gk" id="anim-gk">🧤</div>
+                    <div class="anim-ball" id="anim-ball">⚽</div>
+                </div>
+
+                <div id="pred-step-1">
+                    <p style="margin-bottom: 2rem; font-size: 1.1rem;">¿Qué pasará en este tiro penal? Si aciertas, <strong>¡ganas un MEGA SOBRE de 20 figuritas!</strong></p>
+                    <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                        <button class="btn btn-pack" style="font-size: 1.1rem; padding: 1rem 2rem;" onclick="app.playPenalty('gol')">⚽ ¡SERÁ GOL!</button>
+                        <button class="btn btn-danger" style="font-size: 1.1rem; padding: 1rem 2rem;" onclick="app.playPenalty('atajada')">🧤 ¡LA ATAJA!</button>
+                    </div>
+                </div>
+
+                <div id="pred-step-2" class="hidden">
+                    <h3 id="pred-result-text" style="font-size: 1.5rem; font-weight: 900; margin-top: 1rem; color: var(--text-logo);">PREPARÁNDOSE...</h3>
+                    <button id="btn-pred-reward" class="btn btn-predict hidden" style="margin-top: 2rem; font-size: 1.2rem; position: relative; z-index: 200;" onclick="app.claimReward(20)">🎁 RECLAMAR SOBRE X20</button>
+                    <button id="btn-pred-close" class="btn btn-rank hidden" style="margin-top: 2rem;" onclick="app.closeModal('prediction-modal')">Cerrar</button>
+                </div>
+            </div>
+
+            <!-- PARTIDO 2D -->
+            <div id="tab-partido" class="hidden">
+                <h2 class="pack-title" style="color: var(--wc-blue); margin-top: 1rem;">SIMULACIÓN 2D</h2>
+                
+                <div class="scoreboard">
+                    <span class="score-azul" id="score-azul">0</span> - <span class="score-rojo" id="score-rojo">0</span>
+                </div>
+
+                <div class="pitch-container" id="pitch-container">
+                    <div class="pitch-line"></div>
+                    <div class="pitch-circle"></div>
+                    <div class="pitch-goal-left"></div>
+                    <div class="pitch-goal-right"></div>
+                    <!-- Dots inserted here -->
+                    <div class="flash-text" id="partido-flash">¡GOL!</div>
+                </div>
+
+                <div id="partido-step-1">
+                    <p style="margin-bottom: 2rem; font-size: 1.1rem;">Predice el ganador del partido. Si aciertas, <strong>¡ganas un MEGA PACK de 30 figuritas!</strong></p>
+                    <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                        <button class="btn btn-azul" style="font-size: 1.1rem; padding: 1rem 2rem;" onclick="app.playMatch('azul')">🔵 GANA AZUL</button>
+                        <button class="btn btn-rojo" style="font-size: 1.1rem; padding: 1rem 2rem;" onclick="app.playMatch('rojo')">🔴 GANA ROJO</button>
+                    </div>
+                </div>
+
+                <div id="partido-step-2" class="hidden">
+                    <h3 id="partido-result-text" style="font-size: 1.5rem; font-weight: 900; margin-top: 1rem; color: var(--text-logo);">SIMULANDO...</h3>
+                    <button id="btn-partido-reward" class="btn btn-predict hidden" style="margin-top: 2rem; font-size: 1.2rem; position: relative; z-index: 200;" onclick="app.claimReward(30)">🎁 RECLAMAR SOBRE X30</button>
+                    <button id="btn-partido-close" class="btn btn-rank hidden" style="margin-top: 2rem;" onclick="app.closeModal('prediction-modal')">Cerrar</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Modal Historial -->
+    <div id="history-modal" class="modal">
+        <div class="modal-content" style="max-width: 700px;">
+            <button class="close-btn" onclick="app.closeModal('history-modal')">×</button>
+            <h2 class="section-title" style="margin-bottom: 0;">Historial de Movimientos</h2>
+            <div class="history-list" id="history-list"></div>
+            <div style="text-align: center; margin-top: 1.5rem;">
+                <button class="btn btn-danger" onclick="app.clearHistory()">Borrar Historial</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Ver Equipo -->
+    <div id="team-modal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="app.closeModal('team-modal')">×</button>
+            <h2 id="modal-team-name" style="font-size: 2rem; font-weight: 900; text-transform: uppercase;">Nombre Equipo</h2>
+            <div class="team-stats-modal">
+                <div style="flex: 1;"><div class="progress-bar-container" style="height: 12px; margin-top: 0;"><div id="modal-team-progress" class="progress-bar"></div></div></div>
+                <span id="modal-team-pct" style="font-size: 1.5rem; font-weight: 900; color: var(--wc-green);">0%</span>
+            </div>
+            <p style="color: var(--text-muted); margin-bottom: 1rem; font-size: 0.9rem;">* Click Izquierdo: Sumar | Click Derecho: Restar</p>
+            <div id="stickers-grid" class="stickers-grid"></div>
+        </div>
+    </div>
+
+    <!-- Modal Abrir Sobre -->
+    <div id="pack-modal" class="modal">
+        <div class="modal-content pack-panel" style="max-width: 1000px;">
+            <h2 class="pack-title">Abriendo Sobre</h2>
+            <div id="pack-cards" class="pack-cards"></div>
+            <button id="btn-close-pack" class="btn btn-rank hidden" style="margin-top: 2rem; position: relative; z-index: 5000;" onclick="app.closePackModal()">Aceptar y Guardar</button>
+        </div>
+    </div>
+
+    <footer>
+        <p>Desarrollado por <strong>Lucas Lasciarrea</strong> | Informático Técnico (UAI)</p>
+        <p style="margin-top: 5px; opacity: 0.5; font-size: 0.8rem;">Estética WE ARE 26 - FIFA World Cup</p>
+    </footer>
+
+    <script>
+        const themeToggle = document.getElementById('theme-toggle');
+        const storedTheme = localStorage.getItem('album-theme') || 'dark';
+
+        function applyTheme(theme) {
+            document.body.setAttribute('data-theme', theme);
+            const isDark = theme === 'dark';
+            themeToggle.textContent = isDark ? '🌙 Claro' : '☀️ Oscuro';
+        }
+
+        applyTheme(storedTheme);
+
+        themeToggle.addEventListener('click', () => {
+            const nextTheme = document.body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            localStorage.setItem('album-theme', nextTheme);
+            applyTheme(nextTheme);
+        });
+
+        const NUM_GRUPOS = 12;
+        const EQUIPOS_POR_GRUPO = 4;
+        const FIGURAS_POR_EQUIPO = 20;
+
+        const dataRaw = {
+            nombres: ["México", "Sudáfrica", "Corea del Sur", "Chequia", "Canadá", "Bosnia y Her.", "Qatar", "Suiza", "Brasil", "Marruecos", "Haití", "Escocia", "EE.UU.", "Paraguay", "Australia", "Turquía", "Alemania", "Curazao", "Costa de Marfil", "Ecuador", "Países Bajos", "Japón", "Suecia", "Túnez", "Bélgica", "Egipto", "Irán", "N. Zelanda", "España", "Cabo Verde", "A. Saudita", "Uruguay", "Francia", "Senegal", "Irak", "Noruega", "Argentina", "Argelia", "Austria", "Jordania", "Portugal", "RD Congo", "Uzbekistán", "Colombia", "Inglaterra", "Croacia", "Ghana", "Panamá"],
+            codigos: ["MEX", "RSA", "KOR", "CZE", "CAN", "BIH", "QAT", "SUI", "BRA", "MAR", "HAI", "SCO", "USA", "PAR", "AUS", "TUR", "GER", "CUW", "CIV", "ECU", "NED", "JPN", "SWE", "TUN", "BEL", "EGY", "IRN", "NZL", "ESP", "CPV", "KSA", "URU", "FRA", "SEN", "IRQ", "NOR", "ARG", "ALG", "AUT", "JOR", "POR", "COD", "UZB", "COL", "ENG", "CRO", "GHA", "PAN"],
+            letras: "ABCDEFGHIJKL"
+        };
+
+        const audioHinchada = new Audio('audio/hinchada.mp3');
+        audioHinchada.loop = true;
+        const audioSilbato = new Audio('audio/silbato.mp3');
+        const audioGol = new Audio('audio/gol.mp3');
+        const audioUhhh = new Audio('audio/uhhh.mp3');
+
+        let album = [];
+        let historial = [];
+
+        class AlbumApp {
+            constructor() {
+                this.loadData();
+                this.renderDashboard();
+                this.matchDots = [];
+                this.matchInterval = null;
+                this.countdownInterval = null;
+            }
+
+            loadData() {
+                const storedAlbum = localStorage.getItem('album2026_oficial');
+                if (storedAlbum) { album = JSON.parse(storedAlbum); } 
+                else { this.initializeAlbum(); }
+
+                const storedHistorial = localStorage.getItem('album2026_historial');
+                if (storedHistorial) { historial = JSON.parse(storedHistorial); }
+            }
+
+            saveData() {
+                localStorage.setItem('album2026_oficial', JSON.stringify(album));
+                localStorage.setItem('album2026_historial', JSON.stringify(historial));
+                this.updateGlobalStats();
+            }
+
+            initializeAlbum() {
+                album = [];
+                let idx = 0;
+                for (let i = 0; i < NUM_GRUPOS; i++) {
+                    let grupo = { id: dataRaw.letras[i], tipo: 'grupo', equipos: [] };
+                    for (let j = 0; j < EQUIPOS_POR_GRUPO; j++) {
+                        grupo.equipos.push({ nombre: dataRaw.nombres[idx], codigo: dataRaw.codigos[idx], figuras: new Array(FIGURAS_POR_EQUIPO).fill(0) });
+                        idx++;
+                    }
+                    album.push(grupo);
+                }
+                album.push({
+                    id: 'FWC', tipo: 'especial',
+                    equipos: [{ nombre: "Institucionales", codigo: "FWC", figuras: new Array(FIGURAS_POR_EQUIPO).fill(0) }]
+                });
+                this.saveData();
+                this.logAction("Álbum inicializado");
+            }
+
+            logAction(actionDesc) {
+                const now = new Date();
+                const dateStr = `[${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth()+1).padStart(2, '0')}/${now.getFullYear()} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}]`;
+                historial.unshift({ date: dateStr, action: actionDesc }); 
+                if (historial.length > 200) historial.pop();
+                this.saveData();
+            }
+
+            getStats(equipo) {
+                let obtenidas = 0, repetidas = 0;
+                equipo.figuras.forEach(st => { if (st > 0) obtenidas++; if (st > 1) repetidas += (st - 1); });
+                return { obtenidas, repetidas, pct: (obtenidas / FIGURAS_POR_EQUIPO) * 100 };
+            }
+
+            updateGlobalStats() {
+                let total = 0, repetidas = 0;
+                const totalFiguras = (48 * 20) + 20;
+                album.forEach(g => g.equipos.forEach(eq => { const s = this.getStats(eq); total += s.obtenidas; repetidas += s.repetidas; }));
+                document.getElementById('global-progress').innerText = `${((total / totalFiguras) * 100).toFixed(2)}%`;
+                document.getElementById('global-count').innerText = `${total} / ${totalFiguras}`;
+                document.getElementById('global-rep').innerText = repetidas;
+            }
+
+            renderDashboard() {
+                this.updateGlobalStats();
+                const grid = document.getElementById('groups-grid');
+                grid.innerHTML = '';
+                album.forEach((grupo, gIdx) => {
+                    grupo.equipos.forEach((eq, eIdx) => {
+                        const s = this.getStats(eq);
+                        const card = document.createElement('div');
+                        card.className = 'team-card';
+                        card.onclick = () => this.openTeamModal(gIdx, eIdx);
+                        const badge = grupo.tipo === 'especial' ? 'ESTRELLAS FWC' : `GRUPO ${grupo.id}`;
+                        card.innerHTML = `
+                            <span class="group-badge">${badge}</span>
+                            <div class="card-header"><h3>${eq.nombre}</h3><span class="card-code">${eq.codigo}</span></div>
+                            <div class="progress-bar-container"><div class="progress-bar" style="width: ${s.pct}%"></div></div>
+                            <div class="progress-text">${s.pct.toFixed(1)}% COMPLETADO</div>
+                        `;
+                        grid.appendChild(card);
+                    });
+                });
+            }
+
+            openTeamModal(gIdx, eIdx) {
+                this.currentTeam = { gIdx, eIdx, eq: album[gIdx].equipos[eIdx] };
+                this.renderTeamModal();
+                document.getElementById('team-modal').classList.add('active');
+            }
+
+            renderTeamModal() {
+                const { eq } = this.currentTeam;
+                const s = this.getStats(eq);
+                document.getElementById('modal-team-name').innerText = `${eq.nombre} - ${eq.codigo}`;
+                document.getElementById('modal-team-progress').style.width = `${s.pct}%`;
+                document.getElementById('modal-team-pct').innerText = `${s.pct.toFixed(1)}%`;
+
+                const grid = document.getElementById('stickers-grid');
+                grid.innerHTML = '';
+                eq.figuras.forEach((estado, index) => {
+                    const el = document.createElement('div');
+                    el.className = `sticker ${estado === 0 ? 'st-0' : (estado === 1 ? 'st-1' : 'st-rep')}`;
+                    const imgPath = `imagenes/${eq.codigo}_${index + 1}.jpg`;
+                    
+                    el.innerHTML = `
+                        <img src="${imgPath}" onerror="this.style.display='none';">
+                        <span class="sticker-num">${index + 1}</span>
+                        ${estado > 1 ? `<span class="sticker-badge">+${estado - 1}</span>` : ''}
+                    `;
+                    el.onclick = () => this.modifySticker(index, 1);
+                    el.oncontextmenu = (e) => { e.preventDefault(); this.modifySticker(index, -1); };
+                    grid.appendChild(el);
+                });
+            }
+
+            modifySticker(index, delta) {
+                const eq = this.currentTeam.eq;
+                if (delta < 0 && eq.figuras[index] === 0) return;
+                eq.figuras[index] += delta;
+                const actionName = delta > 0 ? "SUMADA" : "ELIMINADA";
+                this.logAction(`${actionName} - ${eq.codigo} #${index + 1}`);
+                this.saveData(); this.renderTeamModal(); this.renderDashboard(); 
+            }
+
+            closeModal(id) { 
+                document.getElementById(id).classList.remove('active'); 
+                if (id === 'prediction-modal') {
+                    audioHinchada.pause(); audioHinchada.currentTime = 0;
+                    audioGol.pause(); audioGol.currentTime = 0;
+                    audioUhhh.pause(); audioUhhh.currentTime = 0;
+                    document.getElementById('gol-overlay').classList.remove('active');
+                    if(this.matchInterval) clearInterval(this.matchInterval);
+                    if(this.countdownInterval) clearInterval(this.countdownInterval);
+                }
+            }
+
+            // --- HELPER DE CRONOMETRO VIVO ---
+            startCountdown(duration, textElement, onComplete, isMatch=false) {
+                if(this.countdownInterval) clearInterval(this.countdownInterval);
+                let startTime = Date.now();
+                let endTime = startTime + duration;
+                
+                let baseText = isMatch ? "SIMULANDO... " : "PREPARÁNDOSE... ";
+
+                this.countdownInterval = setInterval(() => {
+                    let now = Date.now();
+                    let remaining = endTime - now;
+                    
+                    if (remaining <= 0) {
+                        clearInterval(this.countdownInterval);
+                        textElement.innerHTML = isMatch ? "¡TIEMPO!" : "¡PATEA!";
+                        if(onComplete) onComplete();
+                        return;
+                    }
+
+                    let secs = Math.floor(remaining / 1000);
+                    let millis = Math.floor((remaining % 1000) / 10);
+                    textElement.innerHTML = `${baseText} <span class="timer-text">${secs}.${millis.toString().padStart(2, '0')}''</span>`;
+                }, 30);
+            }
+
+            // --- PESTAÑAS DE MINIJUEGOS ---
+            switchPredTab(tab) {
+                document.getElementById('tab-btn-penal').classList.remove('active');
+                document.getElementById('tab-btn-partido').classList.remove('active');
+                document.getElementById('tab-penal').classList.add('hidden');
+                document.getElementById('tab-partido').classList.add('hidden');
+                
+                document.getElementById(`tab-btn-${tab}`).classList.add('active');
+                document.getElementById(`tab-${tab}`).classList.remove('hidden');
+
+                if(tab === 'partido') this.initPitch();
+            }
+
+            openPredictionModal() {
+                document.getElementById('pred-step-1').classList.remove('hidden');
+                document.getElementById('pred-step-2').classList.add('hidden');
+                document.getElementById('btn-pred-reward').classList.add('hidden');
+                document.getElementById('gol-overlay').classList.remove('active');
+                
+                const ball = document.getElementById('anim-ball');
+                const gk = document.getElementById('anim-gk');
+                ball.className = 'anim-ball'; gk.className = 'anim-gk';
+                ball.style = ''; gk.style = '';
+
+                document.getElementById('partido-step-1').classList.remove('hidden');
+                document.getElementById('partido-step-2').classList.add('hidden');
+                document.getElementById('score-azul').innerText = '0';
+                document.getElementById('score-rojo').innerText = '0';
+
+                this.switchPredTab('penal');
+                audioHinchada.play().catch(e => console.log('El audio requiere interacción'));
+                document.getElementById('prediction-modal').classList.add('active');
+            }
+
+            // --- JUEGO 1: PENALES ---
+            playPenalty(userPrediction) {
+                document.getElementById('pred-step-1').classList.add('hidden');
+                document.getElementById('pred-step-2').classList.remove('hidden');
+                
+                const resultText = document.getElementById('pred-result-text');
+                resultText.style.color = 'var(--text-logo)';
+
+                const isGol = Math.random() > 0.5;
+                const actualResult = isGol ? 'gol' : 'atajada';
+
+                const ball = document.getElementById('anim-ball');
+                const gk = document.getElementById('anim-gk');
+                void ball.offsetWidth;
+
+                this.startCountdown(5000, resultText, () => {
+                    // Acción al terminar 5 segundos
+                    audioSilbato.play().catch(e=>console.log(e));
+                    
+                    if (isGol) {
+                        ball.classList.add('animating-ball-gol');
+                        gk.classList.add('animating-gk-gol');
+                    } else {
+                        ball.classList.add('animating-ball-atajada');
+                        gk.classList.add('animating-gk-atajada');
+                    }
+
+                    setTimeout(() => {
+                        audioHinchada.pause();
+                        let win = (userPrediction === actualResult);
+
+                        if (actualResult === 'gol') {
+                            audioGol.play().catch(e=>console.log(e));
+                            document.getElementById('gol-overlay').classList.add('active');
+                            if(win) this.createConfetti();
+                        } else {
+                            if (win) { 
+                                audioGol.play().catch(e=>console.log(e));
+                                this.createConfetti();
+                            } else {
+                                audioUhhh.play().catch(e=>console.log(e));
+                            }
+                        }
+
+                        if (win) {
+                            resultText.innerHTML = `¡${actualResult.toUpperCase()}! 🎉<br><span style="font-size:1.1rem; color:#A6A6AF;">¡Predicción perfecta!</span>`;
+                            resultText.style.color = 'var(--wc-green)';
+                            document.getElementById('btn-pred-reward').classList.remove('hidden');
+                        } else {
+                            resultText.innerHTML = `¡${actualResult.toUpperCase()}! 😢<br><span style="font-size:1.1rem; color:#A6A6AF;">Suerte la próxima vez.</span>`;
+                            resultText.style.color = 'var(--wc-pink)';
+                            document.getElementById('btn-pred-close').classList.remove('hidden');
+                        }
+                    }, 1500); 
+                }, false);
+            }
+
+            // --- JUEGO 2: PARTIDO 2D ---
+            initPitch() {
+                const pitch = document.getElementById('pitch-container');
+                pitch.querySelectorAll('.match-dot').forEach(el => el.remove());
+                this.matchDots = [];
+                
+                let ball = document.createElement('div');
+                ball.className = 'match-dot dot-ball';
+                pitch.appendChild(ball);
+                this.matchDots.push({el: ball, x: 50, y: 50, isBall: true});
+
+                for(let i=0; i<11; i++) {
+                    let b = document.createElement('div'); b.className = 'match-dot dot-blue'; pitch.appendChild(b);
+                    this.matchDots.push({el: b, x: Math.random()*40 + 5, y: Math.random()*90 + 5});
+                    
+                    let r = document.createElement('div'); r.className = 'match-dot dot-red'; pitch.appendChild(r);
+                    this.matchDots.push({el: r, x: Math.random()*40 + 55, y: Math.random()*90 + 5});
+                }
+                this.updateMatchDots();
+            }
+
+            updateMatchDots() {
+                this.matchDots.forEach(d => {
+                    d.el.style.left = d.x + '%';
+                    d.el.style.top = d.y + '%';
+                });
+            }
+
+            playMatch(userPrediction) {
+                document.getElementById('partido-step-1').classList.add('hidden');
+                document.getElementById('partido-step-2').classList.remove('hidden');
+                document.getElementById('score-azul').innerText = '0';
+                document.getElementById('score-rojo').innerText = '0';
+                document.getElementById('btn-partido-reward').classList.add('hidden');
+                document.getElementById('btn-partido-close').classList.add('hidden');
+                
+                const resText = document.getElementById('partido-result-text');
+                resText.style.color = 'var(--text-logo)';
+
+                let bG = Math.floor(Math.random() * 3);
+                let rG = Math.floor(Math.random() * 3);
+                while (bG === rG) rG = Math.floor(Math.random() * 3); 
+                let actualWinner = bG > rG ? 'azul' : 'rojo';
+
+                let events = [];
+                for(let i=0; i<bG; i++) events.push({time: Math.random()*8000 + 1000, team: 'azul', triggered: false});
+                for(let i=0; i<rG; i++) events.push({time: Math.random()*8000 + 1000, team: 'rojo', triggered: false});
+
+                audioSilbato.play().catch(e=>console.log(e));
+                audioHinchada.play().catch(e=>console.log(e));
+
+                let startTime = Date.now();
+                
+                // Lógica de Movimiento Interactivo del partido (cada 300ms para suavidad)
+                this.matchInterval = setInterval(() => {
+                    let elapsed = Date.now() - startTime;
+                    let ball = this.matchDots[0];
+                    
+                    ball.x += (Math.random() - 0.5) * 30;
+                    ball.y += (Math.random() - 0.5) * 30;
+                    ball.x = Math.max(5, Math.min(95, ball.x));
+                    ball.y = Math.max(5, Math.min(95, ball.y));
+
+                    for(let i=1; i<this.matchDots.length; i++) {
+                        let d = this.matchDots[i];
+                        let dx = ball.x - d.x;
+                        let dy = ball.y - d.y;
+                        d.x += dx * 0.15 + (Math.random() - 0.5) * 15;
+                        d.y += dy * 0.15 + (Math.random() - 0.5) * 15;
+                        d.x = Math.max(2, Math.min(98, d.x));
+                        d.y = Math.max(2, Math.min(98, d.y));
+                    }
+                    this.updateMatchDots();
+
+                    events.forEach(ev => {
+                        if(!ev.triggered && elapsed >= ev.time) {
+                            ev.triggered = true;
+                            this.triggerMatchGoal(ev.team);
+                        }
+                    });
+                }, 300);
+
+                // Arrancar timer visual
+                this.startCountdown(10000, resText, () => {
+                    clearInterval(this.matchInterval);
+                    audioHinchada.pause();
+                    audioSilbato.play().catch(e=>console.log(e));
+
+                    let win = (userPrediction === actualWinner);
+
+                    if (win) {
+                        audioGol.play().catch(e=>console.log(e));
+                        this.createConfetti();
+                        resText.innerHTML = `¡GANÓ EL EQUIPO ${actualWinner.toUpperCase()}! 🎉<br><span style="font-size:1.1rem; color:#A6A6AF;">¡Predicción perfecta!</span>`;
+                        resText.style.color = 'var(--wc-green)';
+                        document.getElementById('btn-partido-reward').classList.remove('hidden');
+                    } else {
+                        audioUhhh.play().catch(e=>console.log(e));
+                        resText.innerHTML = `Ganó el equipo ${actualWinner.toUpperCase()} 😢<br><span style="font-size:1.1rem; color:#A6A6AF;">Suerte la próxima vez.</span>`;
+                        resText.style.color = 'var(--wc-pink)';
+                        document.getElementById('btn-partido-close').classList.remove('hidden');
+                    }
+                }, true);
+            }
+
+            triggerMatchGoal(team) {
+                audioGol.play().catch(e=>console.log(e));
+                let scoreEl = document.getElementById('score-' + team);
+                scoreEl.innerText = parseInt(scoreEl.innerText) + 1;
+                
+                let flash = document.getElementById('partido-flash');
+                flash.innerText = `¡GOL ${team.toUpperCase()}!`;
+                flash.style.color = team === 'azul' ? '#00E5FF' : '#FF005B';
+                flash.classList.add('active');
+                setTimeout(() => flash.classList.remove('active'), 1000);
+            }
+
+            claimReward(amount) {
+                this.closeModal('prediction-modal');
+                this.openPackModal(amount);
+            }
+
+            createConfetti() {
+                const container = document.getElementById('prediction-modal');
+                for (let i = 0; i < 60; i++) {
+                    const conf = document.createElement('div');
+                    conf.className = 'confetti';
+                    conf.style.left = Math.random() * 100 + '%';
+                    conf.style.animationDelay = Math.random() * 2 + 's';
+                    conf.style.backgroundColor = Math.random() > 0.5 ? '#FFFFFF' : '#43A1D5';
+                    container.appendChild(conf);
+                    setTimeout(() => conf.remove(), 4500);
+                }
+            }
+
+            // --- ABRIR SOBRES ---
+            async openPackModal(amount = 5) {
+                const modal = document.getElementById('pack-modal');
+                const container = document.getElementById('pack-cards');
+                const btnClose = document.getElementById('btn-close-pack');
+                
+                container.innerHTML = '';
+                btnClose.classList.add('hidden');
+                modal.classList.add('active');
+
+                let title = 'ABRIENDO SOBRE...';
+                if(amount === 20) title = '¡MEGA SOBRE X20!';
+                if(amount === 30) title = '¡MEGA PACK X30!';
+                document.querySelector('#pack-modal .pack-title').innerText = title;
+
+                for (let i = 0; i < amount; i++) {
+                    let totalEquipos = [];
+                    album.forEach(g => g.equipos.forEach(e => totalEquipos.push(e)));
+                    
+                    const eqAleatorio = totalEquipos[Math.floor(Math.random() * totalEquipos.length)];
+                    const figAleatoria = Math.floor(Math.random() * 20);
+                    
+                    const esNueva = eqAleatorio.figuras[figAleatoria] === 0;
+                    eqAleatorio.figuras[figAleatoria]++;
+
+                    const imgPath = `imagenes/${eqAleatorio.codigo}_${figAleatoria + 1}.jpg`;
+
+                    const card = document.createElement('div');
+                    card.className = `pack-card ${esNueva ? 'new' : 'rep'}`;
+                    
+                    card.innerHTML = `
+                        <img class="pack-img" src="${imgPath}" onerror="this.style.display='none';">
+                        <div class="pack-fallback">
+                            <span class="card-num">${figAleatoria + 1}</span>
+                        </div>
+                        <div class="pack-footer">
+                            <span class="card-team">${eqAleatorio.codigo}</span>
+                            <span class="card-status ${esNueva ? 'status-new' : 'status-rep'}">${esNueva ? 'NUEVA' : 'REP'}</span>
+                        </div>
+                    `;
+                    container.appendChild(card);
+
+                    this.logAction(`SOBRE - ${eqAleatorio.codigo} #${figAleatoria + 1}`);
+
+                    const waitTime = amount > 5 ? 100 : 700;
+                    await new Promise(r => setTimeout(r, waitTime));
+                    card.classList.add('revealed');
+                }
+
+                this.saveData();
+                this.renderDashboard();
+                btnClose.classList.remove('hidden');
+            }
+
+            closePackModal() {
+                this.closeModal('pack-modal');
+            }
+
+            showRanking() {
+                const secRanking = document.getElementById('ranking-section');
+                const secGroups = document.getElementById('groups-section');
+                
+                if (!secRanking.classList.contains('hidden')) {
+                    secRanking.classList.add('hidden');
+                    secGroups.classList.remove('hidden');
+                    return;
+                }
+
+                secGroups.classList.add('hidden');
+                secRanking.classList.remove('hidden');
+
+                let todos = [];
+                album.forEach(g => g.equipos.forEach(eq => {
+                    const s = this.getStats(eq);
+                    todos.push({ nombre: eq.nombre, codigo: eq.codigo, pct: s.pct, obs: s.obtenidas });
+                }));
+
+                todos.sort((a, b) => b.obs - a.obs);
+                const top10 = todos.slice(0, 10);
+
+                const list = document.getElementById('ranking-list');
+                list.innerHTML = '';
+
+                top10.forEach((eq, i) => {
+                    const card = document.createElement('div');
+                    card.className = 'team-card';
+                    card.innerHTML = `
+                        <div style="font-size: 4rem; font-weight: 900; color: rgba(128,128,128,0.1); position: absolute; top: -10px; right: 10px;">#${i+1}</div>
+                        <div class="card-header" style="margin-bottom: 0;">
+                            <h3 style="font-size: 1.5rem;">${eq.nombre}</h3><span class="card-code">${eq.codigo}</span>
+                        </div>
+                        <div class="progress-bar-container"><div class="progress-bar" style="width: ${eq.pct}%"></div></div>
+                        <div class="progress-text" style="color: var(--wc-green); font-size: 1.1rem;">${eq.pct.toFixed(1)}%</div>
+                    `;
+                    list.appendChild(card);
+                });
+            }
+
+            openHistoryModal() {
+                const list = document.getElementById('history-list');
+                list.innerHTML = '';
+                
+                if (historial.length === 0) {
+                    list.innerHTML = '<p style="text-align: center; color: var(--text-muted);">El historial está vacío.</p>';
+                } else {
+                    historial.forEach(h => {
+                        const item = document.createElement('div');
+                        item.className = 'history-item';
+                        item.innerHTML = `<span class="hist-action">${h.action}</span><span class="hist-date">${h.date}</span>`;
+                        list.appendChild(item);
+                    });
+                }
+                
+                document.getElementById('history-modal').classList.add('active');
+            }
+
+            clearHistory() {
+                if (confirm("¿Seguro que deseas borrar el historial de movimientos?")) {
+                    historial = [];
+                    this.saveData();
+                    this.openHistoryModal();
+                }
+            }
+
+            resetAlbum() {
+                if (confirm("🚨 ¿ESTÁS SEGURO? Se borrará todo tu progreso de forma permanente.")) {
+                    localStorage.removeItem('album2026_oficial');
+                    localStorage.removeItem('album2026_historial');
+                    this.loadData();
+                    this.renderDashboard();
+                    document.getElementById('ranking-section').classList.add('hidden');
+                    document.getElementById('groups-section').classList.remove('hidden');
+                }
+            }
+        }
+
+        const app = new AlbumApp();
+    </script>
+</body>
+</html>
