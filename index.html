@@ -2,10 +2,17 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-width=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestor Álbum Mundial 2026</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
+        /* Importamos tu fuente personalizada */
+        @font-face {
+            font-family: 'FWC2026';
+            src: url('audio/FWC2026-UltraCondensedBlack.8e6ba053.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+
         :root {
             --wc-purple: #4A00E0;
             --wc-pink: #FF005B;
@@ -56,7 +63,7 @@
             --glow-opacity: 0.4;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Montserrat', sans-serif; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'FWC2026', sans-serif; letter-spacing: 0.5px; }
 
         body {
             background-color: var(--wc-dark); color: var(--text-main); min-height: 100vh;
@@ -77,40 +84,40 @@
             z-index: -1; pointer-events: none;
         }
 
-        /* PANTALLA DE CARGA */
+        /* PANTALLA DE CARGA - FONDO EN NEGRO INICIALMENTE */
         #loading-screen {
-            position: fixed;
-            inset: 0;
-            background: #000;
-            z-index: 9999;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
+            position: fixed; inset: 0; z-index: 9999; background: #000;
+            display: flex; justify-content: center; align-items: center; flex-direction: column;
             transition: opacity 2s ease, visibility 2s ease;
         }
         
-        #loading-screen.fade-out {
-            opacity: 0;
-            visibility: hidden;
+        #loading-screen.fade-out { opacity: 0; visibility: hidden; }
+
+        #intro-bg {
+            position: absolute; inset: 0; z-index: 1;
+            background: url('audio/fondoinicio.jpg') center center / cover no-repeat;
+            opacity: 0; /* Inicia invisible para hacer fade in */
+            transition: opacity 5s ease; 
         }
+        #intro-bg.visible { opacity: 1; }
+        
+        #intro-bg::after {
+            content: ''; position: absolute; inset: 0;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        #start-btn-container { 
+            z-index: 3; position: relative;
+            display: flex; flex-direction: column; align-items: center; gap: 1.5rem; 
+            transform: translateX(-15vw);
+            opacity: 0; /* Inicia invisible para hacer fade in */
+            transition: opacity 5s ease; 
+        }
+        #start-btn-container.visible { opacity: 1; }
 
         #intro-video {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: none;
-        }
-
-        #start-btn-container {
-            z-index: 10000;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 1.5rem;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            object-fit: cover; display: none; z-index: 2;
         }
 
         .bg-glow {
@@ -134,13 +141,13 @@
 
         .brand { display: flex; align-items: center; gap: 1rem; }
         .trophy-logo { width: 78px; height: auto; display: block; filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.35)); }
-        .brand-text h1 { font-size: 1.2rem; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; color: var(--text-logo); }
-        .brand-text span { font-size: 0.8rem; color: var(--text-muted); font-weight: 700; letter-spacing: 4px; }
+        .brand-text h1 { font-size: 1.4rem; font-weight: normal; text-transform: uppercase; letter-spacing: 2px; color: var(--text-logo); }
+        .brand-text span { font-size: 0.9rem; color: var(--text-muted); letter-spacing: 4px; }
         .header-right { display: flex; align-items: center; gap: 2rem; flex-wrap: wrap; }
         .stats-overview { display: flex; gap: 2rem; }
         .stat-box { display: flex; flex-direction: column; align-items: flex-end; }
-        .stat-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
-        .stat-value { font-size: 1.4rem; font-weight: 900; color: var(--text-logo); }
+        .stat-label { font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+        .stat-value { font-size: 1.6rem; color: var(--text-logo); }
         .val-progress { color: var(--wc-green) !important; }
         .val-rep { color: var(--wc-blue) !important; }
 
@@ -148,11 +155,11 @@
 
         .controls { display: flex; gap: 1rem; margin-bottom: 3rem; flex-wrap: wrap; justify-content: center; }
         .btn {
-            padding: 0.9rem 1.4rem; border: 1px solid var(--wc-border); border-radius: 14px; font-weight: 800; font-size: 0.95rem;
-            text-transform: uppercase; letter-spacing: 1px; cursor: pointer; transition: all 0.25s ease; color: var(--text-logo);
+            padding: 0.9rem 1.4rem; border: 1px solid var(--wc-border); border-radius: 14px; font-size: 1.1rem;
+            text-transform: uppercase; letter-spacing: 1.5px; cursor: pointer; transition: all 0.25s ease; color: var(--text-logo);
             position: relative; overflow: hidden; z-index: 1; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1); background: var(--btn-bg);
         }
-        .btn-theme { padding: 0.6rem 1.2rem; font-size: 0.8rem; border-radius: 50px; }
+        .btn-theme { padding: 0.6rem 1.2rem; font-size: 0.9rem; border-radius: 50px; }
         .btn::before {
             content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: var(--btn-hover);
             z-index: -1; transition: opacity 0.3s; opacity: 0;
@@ -163,28 +170,70 @@
         .btn-pack { background: linear-gradient(135deg, rgba(74, 0, 224, 0.78), rgba(255, 0, 91, 0.8)); color: #ffffff; border-color: rgba(255,255,255,0.14); }
         .btn-predict { background: linear-gradient(135deg, rgba(0, 255, 135, 0.6), rgba(0, 229, 255, 0.7)); color: #040406; border-color: rgba(255,255,255,0.2); }
         .btn-danger { background: rgba(255, 0, 91, 0.05); border: 1px solid rgba(255, 0, 91, 0.5); color: var(--wc-pink); }
+        .btn-extreme { background: rgba(255, 0, 0, 0.15); border: 1px solid #ff0000; color: #ff3333; text-shadow: 0 0 5px rgba(255,0,0,0.5); }
+        .btn-extreme:hover { background: rgba(255, 0, 0, 0.3); }
+        .btn-gold { background: linear-gradient(135deg, #FFD700, #FFA500); color: #000; border: none; box-shadow: 0 0 15px rgba(255, 215, 0, 0.4); }
+        .btn-gold:hover { box-shadow: 0 0 25px rgba(255, 215, 0, 0.6); }
         .btn-azul { background: linear-gradient(135deg, #00E5FF, #007BFF); color: #000; border: none; }
         .btn-rojo { background: linear-gradient(135deg, #FF005B, #D50000); color: #FFF; border: none; }
 
-        .section-title { font-size: 2rem; font-weight: 900; margin-bottom: 2rem; text-transform: uppercase; letter-spacing: 2px; text-align: center; position: relative; color: var(--text-logo); }
+        .section-title { font-size: 2.2rem; margin-bottom: 2rem; text-transform: uppercase; letter-spacing: 2px; text-align: center; position: relative; color: var(--text-logo); }
         .section-title::after { content: ''; position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); width: 60px; height: 4px; background: var(--wc-green); border-radius: 2px; }
 
-        .groups-grid, .ranking-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; }
-        .team-card {
-            background: var(--card-bg); border: 1px solid var(--wc-border); border-radius: 16px; padding: 1.4rem; cursor: pointer;
-            transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease, background 0.4s ease;
-            position: relative; backdrop-filter: blur(10px); box-shadow: var(--shadow-soft);
+        /* SISTEMA DE ACORDEONES POR GRUPOS */
+        .groups-wrapper { display: flex; flex-direction: column; gap: 1.5rem; }
+        .group-container { 
+            background: var(--card-bg); 
+            border: 1px solid var(--wc-border); 
+            border-radius: 16px; 
+            overflow: hidden; 
+            box-shadow: var(--shadow-soft);
         }
-        .team-card:hover { transform: translateY(-4px); border-color: var(--wc-purple); box-shadow: 0 14px 34px rgba(0, 0, 0, 0.15); }
+        .group-header { 
+            padding: 1.5rem 2rem; 
+            background: var(--header-bg); 
+            cursor: pointer; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            border-bottom: 1px solid transparent;
+            transition: background 0.3s ease; 
+        }
+        .group-header:hover { filter: brightness(1.1); }
+        .group-container:not(.collapsed) .group-header { border-bottom-color: var(--wc-border); }
+        
+        .group-header h3 { font-size: 1.8rem; color: var(--text-logo); margin: 0; text-transform: uppercase; }
+        .group-header-stats { display: flex; gap: 1.5rem; align-items: center; }
+        .group-stat { font-size: 1.1rem; color: var(--wc-green); font-family: sans-serif; font-weight: 900; }
+        .group-toggle { font-size: 1.2rem; transition: transform 0.3s ease; color: var(--text-muted); font-family: sans-serif;}
+        
+        .group-container.collapsed .group-toggle { transform: rotate(-90deg); }
+        .group-container.collapsed .group-content { display: none; }
+        
+        .group-content { 
+            padding: 2rem; 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+            gap: 1.5rem; 
+            background: rgba(0,0,0,0.15);
+        }
+
+        .ranking-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; }
+
+        .team-card {
+            background: var(--card-bg); border: 1px solid var(--wc-border); border-radius: 12px; padding: 1.4rem; cursor: pointer;
+            transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+            position: relative; backdrop-filter: blur(10px);
+        }
+        .team-card:hover { transform: translateY(-4px); border-color: var(--wc-purple); box-shadow: 0 14px 34px rgba(0, 0, 0, 0.25); }
         .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
-        .card-header h3 { font-size: 1.3rem; font-weight: 900; color: var(--text-logo); }
-        .card-code { background: var(--wc-border); padding: 4px 8px; border-radius: 6px; font-size: 0.8rem; font-weight: 700; color: var(--text-logo); }
-        .group-badge { display: inline-block; font-size: 0.7rem; font-weight: 900; text-transform: uppercase; color: var(--wc-yellow); margin-bottom: 0.5rem; }
+        .card-header h3 { font-size: 1.5rem; color: var(--text-logo); }
+        .card-code { background: var(--wc-border); padding: 4px 8px; border-radius: 6px; font-size: 0.9rem; color: var(--text-logo); }
         
         .progress-bar-container { width: 100%; height: 8px; background: rgba(0,0,0,0.15); border-radius: 4px; overflow: hidden; margin: 1rem 0 0.5rem; }
         [data-theme="dark"] .progress-bar-container { background: rgba(0,0,0,0.5); }
         .progress-bar { height: 100%; background: linear-gradient(90deg, #7c3aed, #a78bfa); width: 0%; transition: width 0.8s ease; }
-        .progress-text { text-align: right; font-size: 0.9rem; font-weight: 700; color: var(--text-muted); }
+        .progress-text { text-align: right; font-size: 0.9rem; color: var(--text-muted); font-family: sans-serif; font-weight: 700;}
 
         .modal {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px);
@@ -200,7 +249,7 @@
         .close-btn {
             position: absolute; top: 1.5rem; right: 1.5rem; background: var(--btn-bg); border: 1px solid var(--wc-border);
             color: var(--text-logo); width: 40px; height: 40px; border-radius: 50%; font-size: 1.5rem; cursor: pointer; display: flex; justify-content: center; align-items: center;
-            z-index: 2000;
+            z-index: 2000; font-family: sans-serif;
         }
         .close-btn:hover { background: var(--wc-pink); color: #fff; }
 
@@ -210,23 +259,70 @@
         }
 
         .stickers-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(65px, 1fr)); gap: 1rem; }
+        
         .sticker {
             aspect-ratio: 3/4; border-radius: 8px; display: flex; flex-direction: column; justify-content: center; align-items: center;
-            font-weight: 900; font-size: 1.2rem; cursor: pointer; user-select: none; transition: all 0.2s ease; position: relative;
-            background: var(--sticker-bg); border: 2px solid var(--wc-border); color: var(--text-muted); overflow: hidden;
+            font-size: 1.4rem; cursor: pointer; user-select: none; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); position: relative;
+            background: var(--sticker-bg); border: 2px solid var(--wc-border); color: var(--text-muted);
         }
-        .sticker img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.15; transition: opacity 0.3s; }
+        
+        .sticker img { 
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+            object-fit: cover; opacity: 0.15; transition: opacity 0.3s; 
+            border-radius: 6px; 
+            overflow: hidden;
+        }
         .sticker.st-1 img { opacity: 1; }
         .sticker.st-rep img { opacity: 1; filter: grayscale(50%) sepia(50%) hue-rotate(180deg); }
         .sticker.st-1 { background: rgba(0, 255, 135, 0.1); color: var(--wc-green) !important; border-color: var(--wc-green); box-shadow: 0 0 15px rgba(0, 255, 135, 0.2); }
         .sticker.st-rep { background: rgba(0, 229, 255, 0.1); color: var(--wc-blue) !important; border-color: var(--wc-blue); }
-        .sticker-badge { position: absolute; top: -5px; right: -5px; background: var(--wc-blue); color: #000; font-size: 0.75rem; padding: 3px 6px; border-radius: 12px; font-weight: 900; z-index: 2;}
-        .sticker-num { position: absolute; z-index: 1; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
-        .sticker.st-1 .sticker-num, .sticker.st-rep .sticker-num { display: none; }
+
+        .holo-shine {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            border-radius: 6px; pointer-events: none; z-index: 3; opacity: 0;
+            background: linear-gradient(115deg, transparent 20%, rgba(255, 215, 0, 0.7) 30%, rgba(255, 0, 128, 0.5) 40%, rgba(0, 238, 255, 0.5) 50%, transparent 60%);
+            background-size: 300% 300%;
+            transition: opacity 0.3s;
+        }
+        
+        @keyframes holo-anim {
+            0% { background-position: 300% 0; }
+            100% { background-position: -300% 0; }
+        }
+
+        .sticker.holo-effect { border-color: rgba(255, 215, 0, 0.4); }
+        .sticker.holo-effect:hover {
+            transform: scale(1.1) perspective(500px) rotateY(15deg) rotateX(10deg);
+            box-shadow: -5px 10px 20px rgba(255, 215, 0, 0.5), 5px -5px 15px rgba(0, 229, 255, 0.4);
+            border-color: #FFD700;
+            z-index: 10;
+        }
+        .sticker.holo-effect:hover .holo-shine, .pack-card.holo-effect.revealed .holo-shine {
+            opacity: 1;
+            animation: holo-anim 2s infinite linear;
+        }
+
+        .sticker-badge { 
+            position: absolute; top: -10px; right: -10px; 
+            background: var(--wc-blue); color: #000; 
+            font-size: 0.9rem; 
+            width: 24px; height: 24px; border-radius: 50%; 
+            display: flex; justify-content: center; align-items: center; 
+            z-index: 5; box-shadow: 0 2px 5px rgba(0,0,0,0.6); 
+            line-height: 1; font-family: sans-serif; font-weight: 900;
+        }
+        
+        .sticker-num { 
+            position: absolute; 
+            z-index: 2; 
+            font-size: 1.6rem;
+            color: #FFFFFF;
+            text-shadow: 0 2px 6px rgba(0,0,0,1), 0 0 10px rgba(0,0,0,0.8), 0 0 15px rgba(0,0,0,0.6); 
+        }
         .sticker:hover { transform: translateY(-5px); border-color: var(--wc-purple); }
 
         .pack-panel { text-align: center; background: radial-gradient(circle at top, rgba(74, 0, 224, 0.14), transparent 38%), var(--modal-bg); border: 1px solid var(--wc-border); border-radius: 20px; padding: 2rem; }
-        .pack-title { font-size: 2.5rem; font-weight: 900; text-transform: uppercase; color: var(--wc-yellow); margin-bottom: 2rem; letter-spacing: 2px; }
+        .pack-title { font-size: 3rem; text-transform: uppercase; color: var(--wc-yellow); margin-bottom: 2rem; letter-spacing: 2px; }
         .pack-cards { display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap; margin: 2rem 0; min-height: 250px; perspective: 1000px; }
         
         .pack-card {
@@ -241,22 +337,29 @@
         .pack-card.revealed { opacity: 1; transform: translateY(0) rotateY(0) scale(1); }
         .pack-card.new { border-color: var(--wc-green); background: radial-gradient(circle at top, rgba(0, 255, 135, 0.2), var(--pack-bg)); box-shadow: 0 0 30px rgba(0, 255, 135, 0.3); }
         .pack-card.rep { border-color: var(--wc-blue); background: radial-gradient(circle at top, rgba(0, 229, 255, 0.2), var(--pack-bg)); box-shadow: 0 0 30px rgba(0, 229, 255, 0.3); }
+        
+        .pack-card.holo-effect.revealed { border-color: #FFD700; box-shadow: 0 0 30px rgba(255, 215, 0, 0.5); }
+
+        .epic-glow { 
+            box-shadow: 0 0 40px #FFD700, 0 0 80px #FFD700, inset 0 0 20px #FFD700 !important; 
+            border: 4px solid #FFD700 !important; 
+        }
 
         .pack-img { width: 100%; height: 100%; object-fit: cover; position: absolute; top:0; left:0; z-index: 0; }
         .pack-fallback { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 1; background: transparent; }
         .pack-footer { position: absolute; bottom: 0; width: 100%; padding: 10px; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); z-index: 2; display: flex; justify-content: space-between; align-items: center; }
         
-        .card-team { font-size: 1.2rem; font-weight: 900; color: #fff; }
-        .card-status { font-size: 0.7rem; font-weight: 900; padding: 4px 8px; border-radius: 6px; text-transform: uppercase; }
+        .card-team { font-size: 1.3rem; color: #fff; }
+        .card-status { font-size: 0.8rem; padding: 4px 8px; border-radius: 6px; text-transform: uppercase; }
         .status-new { background: var(--wc-green); color: #040406; }
         .status-rep { background: var(--wc-blue); color: #040406; }
 
         /* PREDICTION ANIMATION & TABS */
         .tabs { display: flex; justify-content: center; gap: 1rem; margin-bottom: 1.5rem; }
-        .tab-btn { background: rgba(255,255,255,0.05); border: 2px solid transparent; color: var(--text-logo); padding: 0.8rem 1.5rem; border-radius: 12px; font-weight: 800; cursor: pointer; transition: all 0.3s; }
+        .tab-btn { background: rgba(255,255,255,0.05); border: 2px solid transparent; color: var(--text-logo); padding: 0.8rem 1.5rem; border-radius: 12px; cursor: pointer; transition: all 0.3s; font-size: 1.1rem; }
         .tab-btn.active { border-color: var(--wc-green); background: rgba(0, 255, 135, 0.1); }
 
-        .timer-text { font-family: monospace; letter-spacing: 1px; color: var(--wc-yellow); font-size: 1.8rem;}
+        .timer-text { font-family: monospace; letter-spacing: 1px; color: var(--wc-yellow); font-size: 2rem;}
 
         .penalty-container {
             position: relative; width: 100%; max-width: 400px; height: 250px; margin: 0 auto 2rem;
@@ -281,7 +384,7 @@
         .animating-gk-atajada { left: 35% !important; top: 80px !important; transform: translateX(-50%) rotate(-30deg) scale(1.1) !important; }
 
         /* PARTIDO 2D */
-        .scoreboard { font-size: 2.5rem; font-weight: 900; margin-bottom: 1rem; color: var(--text-logo); }
+        .scoreboard { font-size: 3rem; margin-bottom: 1rem; color: var(--text-logo); }
         .score-azul { color: #00E5FF; }
         .score-rojo { color: #FF005B; }
         
@@ -302,7 +405,7 @@
 
         .flash-text {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0);
-            font-size: 3rem; font-weight: 900; opacity: 0; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            font-size: 3.5rem; opacity: 0; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             pointer-events: none; z-index: 20; text-shadow: 0 4px 15px rgba(0,0,0,0.8);
         }
         .flash-text.active { transform: translate(-50%, -50%) scale(1); opacity: 1; }
@@ -310,7 +413,7 @@
         /* GOOOOL Overlay */
         .gol-overlay {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0);
-            font-size: 3.5rem; font-weight: 900; color: #FFF; text-shadow: 0 0 10px #43A1D5, 0 0 20px #43A1D5, 0 0 40px #FFFFFF;
+            font-size: 4.5rem; color: #FFF; text-shadow: 0 0 10px #43A1D5, 0 0 20px #43A1D5, 0 0 40px #FFFFFF;
             opacity: 0; z-index: 30; transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); pointer-events: none;
         }
         .gol-overlay.active { transform: translate(-50%, -50%) scale(1); opacity: 1; }
@@ -320,12 +423,12 @@
 
         /* HISTORIAL */
         .history-list { max-height: 400px; overflow-y: auto; text-align: left; margin-top: 1rem; background: rgba(0,0,0,0.2); border-radius: 10px; padding: 1rem; }
-        .history-item { padding: 0.8rem; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.9rem; display: flex; justify-content: space-between; }
+        .history-item { padding: 0.8rem; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 1.1rem; display: flex; justify-content: space-between; font-family: sans-serif;}
         .history-item:last-child { border-bottom: none; }
-        .hist-date { color: var(--text-muted); font-size: 0.8rem; }
-        .hist-action { font-weight: 700; color: var(--text-logo); }
+        .hist-date { color: var(--text-muted); font-size: 0.9rem; }
+        .hist-action { color: var(--text-logo); }
 
-        footer { text-align: center; padding: 1.25rem 2rem; color: var(--text-muted); font-size: 0.9rem; border-top: 1px solid var(--wc-border); margin-top: auto; background: var(--footer-bg); }
+        footer { text-align: center; padding: 1.25rem 2rem; color: var(--text-muted); font-size: 1rem; border-top: 1px solid var(--wc-border); margin-top: auto; background: var(--footer-bg); font-family: sans-serif; }
         .hidden { display: none !important; }
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: var(--wc-dark); }
@@ -335,11 +438,15 @@
 </head>
 <body>
 
-    <!-- PANTALLA DE CARGA -->
+    <!-- ELEMENTO DE AUDIO PARA EL INICIO -->
+    <audio id="intro-audio" src="audio/feetdontfail.mp3" loop preload="auto"></audio>
+
+    <!-- PANTALLA DE CARGA CON NUEVA ESTRUCTURA DE TRANSICIONES -->
     <div id="loading-screen">
+        <div id="intro-bg"></div>
         <div id="start-btn-container">
-            <h1 style="color: white; font-weight: 900; font-size: 2rem;">ÁLBUM MUNDIAL 2026</h1>
-            <button id="start-intro-btn" class="btn btn-pack" style="font-size: 1.2rem; padding: 1rem 2rem;">Ingresar</button>
+            <h1 style="color: white; font-size: 3.5rem; text-shadow: 2px 4px 10px rgba(0,0,0,0.8);">ÁLBUM MUNDIAL 2026</h1>
+            <button id="start-intro-btn" class="btn btn-pack" style="font-size: 1.4rem; padding: 1rem 2rem; box-shadow: 0 8px 20px rgba(0,0,0,0.6);">Ingresar</button>
         </div>
         <video id="intro-video" playsinline>
             <source src="audio/FWC.mp4" type="video/mp4">
@@ -370,9 +477,11 @@
         <div class="controls">
             <button class="btn btn-predict" onclick="app.openPredictionModal()">⚽ Minijuegos</button>
             <button class="btn btn-pack" onclick="app.openPackModal(5)">📦 Abrir Sobre</button>
+            <button class="btn btn-gold" onclick="app.openPromoModal()">🎟️ Códigos</button>
             <button class="btn btn-rank" onclick="app.showRanking()">🏆 Ranking</button>
             <button class="btn btn-rank" onclick="app.openHistoryModal()">📄 Historial</button>
-            <button class="btn btn-danger" onclick="app.resetAlbum()">🗑️ Borrar Progreso</button>
+            <button class="btn btn-danger" onclick="app.resetAlbum()">🗑️ Borrar Álbum</button>
+            <button class="btn btn-extreme" onclick="app.hardResetAlbum()">☢️ Vaciado Completo</button>
         </div>
 
         <section id="ranking-section" class="hidden">
@@ -382,9 +491,32 @@
 
         <section id="groups-section">
             <h2 class="section-title">Equipos por Grupos</h2>
-            <div id="groups-grid" class="groups-grid"></div>
+            <!-- AQUÍ SE GENERARÁN LOS ACORDEONES POR GRUPOS -->
+            <div id="groups-wrapper" class="groups-wrapper"></div>
         </section>
     </main>
+
+    <!-- Modal Códigos Promocionales -->
+    <div id="promo-modal" class="modal">
+        <div class="modal-content" style="max-width: 500px; text-align: center;">
+            <button class="close-btn" onclick="app.closeModal('promo-modal')">×</button>
+            <h2 class="section-title" style="margin-bottom: 1.5rem;">CÓDIGO PROMOCIONAL</h2>
+            <input type="text" id="promo-input" placeholder="INGRESA TU CÓDIGO" style="width: 100%; padding: 1rem; margin-bottom: 1rem; font-size: 1.5rem; text-transform: uppercase; text-align: center; background: rgba(0,0,0,0.2); color: var(--text-main); border: 2px solid var(--wc-border); border-radius: 12px; outline: none;">
+            <button class="btn btn-gold" style="width: 100%; font-size: 1.3rem; padding: 1rem;" onclick="app.redeemPromo()">CANJEAR</button>
+            <p id="promo-message" style="margin-top: 1.5rem; height: 1.5rem; font-family: sans-serif;"></p>
+        </div>
+    </div>
+
+    <!-- Modal Animación Épica Messi -->
+    <div id="epic-modal" class="modal">
+        <div class="modal-content pack-panel" style="max-width: 600px; text-align: center; background: radial-gradient(circle, rgba(255,215,0,0.15) 0%, var(--modal-bg) 80%); border-color: gold; overflow: hidden;">
+            <h2 id="epic-title" class="pack-title" style="color: #FFD700; text-shadow: 0 0 20px rgba(255,215,0,0.8); opacity: 0; transition: opacity 1s;">Buscando al Elegido...</h2>
+            <div id="epic-card-container" style="display: flex; justify-content: center; margin: 3rem 0; perspective: 1000px; min-height: 280px;">
+                <!-- Aquí se inyecta la figurita -->
+            </div>
+            <button id="btn-close-epic" class="btn btn-gold hidden" style="margin-top: 1rem; font-size: 1.4rem; padding: 1rem 3rem;" onclick="app.closeEpicModal()">¡INCREÍBLE!</button>
+        </div>
+    </div>
 
     <!-- Modal Prediction & Minigames -->
     <div id="prediction-modal" class="modal">
@@ -409,16 +541,16 @@
                 </div>
 
                 <div id="pred-step-1">
-                    <p style="margin-bottom: 2rem; font-size: 1.1rem;">¿Qué pasará en este tiro penal? Si aciertas, <strong>¡ganas un MEGA SOBRE de 20 figuritas!</strong></p>
+                    <p style="margin-bottom: 2rem; font-size: 1.2rem; font-family: sans-serif;">¿Qué pasará en este tiro penal? Si aciertas, <strong>¡ganas un MEGA SOBRE de 20 figuritas!</strong></p>
                     <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-                        <button class="btn btn-pack" style="font-size: 1.1rem; padding: 1rem 2rem;" onclick="app.playPenalty('gol')">⚽ ¡SERÁ GOL!</button>
-                        <button class="btn btn-danger" style="font-size: 1.1rem; padding: 1rem 2rem;" onclick="app.playPenalty('atajada')">🧤 ¡LA ATAJA!</button>
+                        <button class="btn btn-pack" style="font-size: 1.3rem; padding: 1rem 2rem;" onclick="app.playPenalty('gol')">⚽ ¡SERÁ GOL!</button>
+                        <button class="btn btn-danger" style="font-size: 1.3rem; padding: 1rem 2rem;" onclick="app.playPenalty('atajada')">🧤 ¡LA ATAJA!</button>
                     </div>
                 </div>
 
                 <div id="pred-step-2" class="hidden">
-                    <h3 id="pred-result-text" style="font-size: 1.5rem; font-weight: 900; margin-top: 1rem; color: var(--text-logo);">PREPARÁNDOSE...</h3>
-                    <button id="btn-pred-reward" class="btn btn-predict hidden" style="margin-top: 2rem; font-size: 1.2rem; position: relative; z-index: 200;" onclick="app.claimReward(20)">🎁 RECLAMAR SOBRE X20</button>
+                    <h3 id="pred-result-text" style="font-size: 2rem; margin-top: 1rem; color: var(--text-logo);">PREPARÁNDOSE...</h3>
+                    <button id="btn-pred-reward" class="btn btn-predict hidden" style="margin-top: 2rem; font-size: 1.4rem; position: relative; z-index: 200;" onclick="app.claimReward(20)">🎁 RECLAMAR SOBRE X20</button>
                     <button id="btn-pred-close" class="btn btn-rank hidden" style="margin-top: 2rem;" onclick="app.closeModal('prediction-modal')">Cerrar</button>
                 </div>
             </div>
@@ -436,25 +568,23 @@
                     <div class="pitch-circle"></div>
                     <div class="pitch-goal-left"></div>
                     <div class="pitch-goal-right"></div>
-                    <!-- Dots inserted here -->
                     <div class="flash-text" id="partido-flash">¡GOL!</div>
                 </div>
 
                 <div id="partido-step-1">
-                    <p style="margin-bottom: 2rem; font-size: 1.1rem;">Predice el ganador del partido. Si aciertas, <strong>¡ganas un MEGA PACK de 30 figuritas!</strong></p>
+                    <p style="margin-bottom: 2rem; font-size: 1.2rem; font-family: sans-serif;">Predice el ganador del partido. Si aciertas, <strong>¡ganas un MEGA PACK de 30 figuritas!</strong></p>
                     <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-                        <button class="btn btn-azul" style="font-size: 1.1rem; padding: 1rem 2rem;" onclick="app.playMatch('azul')">🔵 GANA AZUL</button>
-                        <button class="btn btn-rojo" style="font-size: 1.1rem; padding: 1rem 2rem;" onclick="app.playMatch('rojo')">🔴 GANA ROJO</button>
+                        <button class="btn btn-azul" style="font-size: 1.3rem; padding: 1rem 2rem;" onclick="app.playMatch('azul')">🔵 GANA AZUL</button>
+                        <button class="btn btn-rojo" style="font-size: 1.3rem; padding: 1rem 2rem;" onclick="app.playMatch('rojo')">🔴 GANA ROJO</button>
                     </div>
                 </div>
 
                 <div id="partido-step-2" class="hidden">
-                    <h3 id="partido-result-text" style="font-size: 1.5rem; font-weight: 900; margin-top: 1rem; color: var(--text-logo);">SIMULANDO...</h3>
-                    <button id="btn-partido-reward" class="btn btn-predict hidden" style="margin-top: 2rem; font-size: 1.2rem; position: relative; z-index: 200;" onclick="app.claimReward(30)">🎁 RECLAMAR SOBRE X30</button>
+                    <h3 id="partido-result-text" style="font-size: 2rem; margin-top: 1rem; color: var(--text-logo);">SIMULANDO...</h3>
+                    <button id="btn-partido-reward" class="btn btn-predict hidden" style="margin-top: 2rem; font-size: 1.4rem; position: relative; z-index: 200;" onclick="app.claimReward(30)">🎁 RECLAMAR SOBRE X30</button>
                     <button id="btn-partido-close" class="btn btn-rank hidden" style="margin-top: 2rem;" onclick="app.closeModal('prediction-modal')">Cerrar</button>
                 </div>
             </div>
-
         </div>
     </div>
 
@@ -474,12 +604,12 @@
     <div id="team-modal" class="modal">
         <div class="modal-content">
             <button class="close-btn" onclick="app.closeModal('team-modal')">×</button>
-            <h2 id="modal-team-name" style="font-size: 2rem; font-weight: 900; text-transform: uppercase;">Nombre Equipo</h2>
+            <h2 id="modal-team-name" style="font-size: 2.5rem; text-transform: uppercase;">Nombre Equipo</h2>
             <div class="team-stats-modal">
                 <div style="flex: 1;"><div class="progress-bar-container" style="height: 12px; margin-top: 0;"><div id="modal-team-progress" class="progress-bar"></div></div></div>
-                <span id="modal-team-pct" style="font-size: 1.5rem; font-weight: 900; color: var(--wc-green);">0%</span>
+                <span id="modal-team-pct" style="font-size: 1.8rem; color: var(--wc-green);">0%</span>
             </div>
-            <p style="color: var(--text-muted); margin-bottom: 1rem; font-size: 0.9rem;">* Click Izquierdo: Sumar | Click Derecho: Restar</p>
+            <p style="color: var(--text-muted); margin-bottom: 1.5rem; font-size: 1rem; font-family: sans-serif;">* Click Izquierdo: Sumar | Click Derecho: Restar</p>
             <div id="stickers-grid" class="stickers-grid"></div>
         </div>
     </div>
@@ -489,41 +619,80 @@
         <div class="modal-content pack-panel" style="max-width: 1000px;">
             <h2 class="pack-title">Abriendo Sobre</h2>
             <div id="pack-cards" class="pack-cards"></div>
-            <button id="btn-close-pack" class="btn btn-rank hidden" style="margin-top: 2rem; position: relative; z-index: 5000;" onclick="app.closePackModal()">Aceptar y Guardar</button>
+            <button id="btn-close-pack" class="btn btn-rank hidden" style="margin-top: 2rem; position: relative; z-index: 5000; font-size: 1.2rem;" onclick="app.closePackModal()">Aceptar y Guardar</button>
         </div>
     </div>
 
     <footer>
-        <p>Desarrollado por <strong>Lucas Lasciarrea</strong> | Informático Técnico (UAI)</p>
-        <p style="margin-top: 5px; opacity: 0.5; font-size: 0.8rem;">Estética WE ARE 26 - FIFA World Cup</p>
+        <p>Desarrollado por <strong>Lucas Lasciarrea</strong> | Técnico Informático </p>
+        <p style="margin-top: 5px; opacity: 0.5; font-size: 0.9rem;">Estética WE ARE 26 - FIFA World Cup</p>
     </footer>
 
     <script>
         // --- LÓGICA DE PANTALLA DE CARGA ---
         document.addEventListener('DOMContentLoaded', () => {
             const loadingScreen = document.getElementById('loading-screen');
+            const introBg = document.getElementById('intro-bg');
             const startBtnContainer = document.getElementById('start-btn-container');
             const startBtn = document.getElementById('start-intro-btn');
             const introVideo = document.getElementById('intro-video');
+            const introAudio = document.getElementById('intro-audio');
+
+            // FADE IN DE 5 SEGUNDOS AL INICIAR LA WEB
+            setTimeout(() => {
+                introBg.classList.add('visible');
+                startBtnContainer.classList.add('visible');
+                
+                // Intentamos reproducir el audio automático. Si el navegador lo bloquea, se manejará en silencio.
+                const playPromise = introAudio.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(error => {
+                        console.log('Autoplay bloqueado por el navegador. Se reproducirá cuando el usuario interactúe.');
+                        
+                        // FALLBACK: Reproducir el audio en el primer clic del usuario si fue bloqueado
+                        document.addEventListener('click', function playOnFirstClick() {
+                            introAudio.play();
+                            document.removeEventListener('click', playOnFirstClick);
+                        }, { once: true });
+                    });
+                }
+            }, 100);
 
             startBtn.addEventListener('click', () => {
-                startBtnContainer.style.display = 'none';
-                introVideo.style.display = 'block';
-                introVideo.play();
+                // Iniciar el fade out gradual de los elementos del inicio
+                startBtnContainer.style.opacity = '0';
+                introBg.style.opacity = '0';
+
+                // Bajar el volumen del audio progresivamente durante 5 segundos
+                let vol = 1;
+                let fadeAudio = setInterval(() => {
+                    if (vol > 0.05) {
+                        vol -= 0.05;
+                        introAudio.volume = vol;
+                    } else {
+                        clearInterval(fadeAudio);
+                        introAudio.pause();
+                        introAudio.volume = 1; // restauramos volumen por si se usa de nuevo
+                    }
+                }, 250); // 250ms * 20 iteraciones = 5000ms (5 segundos)
+
+                // Tras los 5 segundos de animación de salida, mostramos y reproducimos el video
+                setTimeout(() => {
+                    startBtnContainer.style.display = 'none';
+                    introBg.style.display = 'none';
+                    
+                    introVideo.style.display = 'block';
+                    introVideo.play();
+                }, 5000);
             });
 
             introVideo.addEventListener('ended', () => {
-                // Inicia el degradado de 2 segundos definido en el CSS
-                loadingScreen.classList.add('fade-out');
-                
-                // Remueve el contenedor del DOM una vez terminada la transición
-                setTimeout(() => {
-                    loadingScreen.style.display = 'none';
-                }, 2000); 
+                loadingScreen.style.transition = 'opacity 2s ease';
+                loadingScreen.style.opacity = '0';
+                setTimeout(() => { loadingScreen.style.display = 'none'; }, 2000); 
             });
         });
 
-        // --- RESTO DEL CÓDIGO ORIGINAL ---
         const themeToggle = document.getElementById('theme-toggle');
         const storedTheme = localStorage.getItem('album-theme') || 'dark';
 
@@ -562,6 +731,7 @@
 
         class AlbumApp {
             constructor() {
+                this.expandedGroups = new Set(); // Guarda los índices de los grupos abiertos
                 this.loadData();
                 this.renderDashboard();
                 this.matchDots = [];
@@ -576,11 +746,14 @@
 
                 const storedHistorial = localStorage.getItem('album2026_historial');
                 if (storedHistorial) { historial = JSON.parse(storedHistorial); }
+
+                this.usedCodes = JSON.parse(localStorage.getItem('album2026_codes')) || [];
             }
 
             saveData() {
                 localStorage.setItem('album2026_oficial', JSON.stringify(album));
                 localStorage.setItem('album2026_historial', JSON.stringify(historial));
+                localStorage.setItem('album2026_codes', JSON.stringify(this.usedCodes));
                 this.updateGlobalStats();
             }
 
@@ -628,23 +801,63 @@
 
             renderDashboard() {
                 this.updateGlobalStats();
-                const grid = document.getElementById('groups-grid');
-                grid.innerHTML = '';
+                const wrapper = document.getElementById('groups-wrapper');
+                wrapper.innerHTML = '';
+                
                 album.forEach((grupo, gIdx) => {
+                    const groupContainer = document.createElement('div');
+                    // Si el set tiene este índice, lo dejamos abierto; sino, lo colapsamos.
+                    groupContainer.className = `group-container ${this.expandedGroups.has(gIdx) ? '' : 'collapsed'}`;
+                    
+                    let groupObtenidas = 0;
+                    const groupTotal = grupo.equipos.length * FIGURAS_POR_EQUIPO;
+
+                    const header = document.createElement('div');
+                    header.className = 'group-header';
+                    
+                    const content = document.createElement('div');
+                    content.className = 'group-content';
+
                     grupo.equipos.forEach((eq, eIdx) => {
                         const s = this.getStats(eq);
+                        groupObtenidas += s.obtenidas;
+
                         const card = document.createElement('div');
                         card.className = 'team-card';
                         card.onclick = () => this.openTeamModal(gIdx, eIdx);
-                        const badge = grupo.tipo === 'especial' ? 'ESTRELLAS FWC' : `GRUPO ${grupo.id}`;
+                        
                         card.innerHTML = `
-                            <span class="group-badge">${badge}</span>
                             <div class="card-header"><h3>${eq.nombre}</h3><span class="card-code">${eq.codigo}</span></div>
                             <div class="progress-bar-container"><div class="progress-bar" style="width: ${s.pct}%"></div></div>
                             <div class="progress-text">${s.pct.toFixed(1)}% COMPLETADO</div>
                         `;
-                        grid.appendChild(card);
+                        content.appendChild(card);
                     });
+
+                    const groupPct = ((groupObtenidas / groupTotal) * 100).toFixed(1);
+                    const titleText = grupo.tipo === 'especial' ? 'ESTRELLAS FWC' : `GRUPO ${grupo.id}`;
+                    
+                    header.innerHTML = `
+                        <h3>${titleText}</h3>
+                        <div class="group-header-stats">
+                            <span class="group-stat">${groupPct}% Completado</span>
+                            <span class="group-toggle">▼</span>
+                        </div>
+                    `;
+
+                    // Lógica para abrir/cerrar y guardar estado
+                    header.onclick = () => {
+                        groupContainer.classList.toggle('collapsed');
+                        if (groupContainer.classList.contains('collapsed')) {
+                            this.expandedGroups.delete(gIdx);
+                        } else {
+                            this.expandedGroups.add(gIdx);
+                        }
+                    };
+
+                    groupContainer.appendChild(header);
+                    groupContainer.appendChild(content);
+                    wrapper.appendChild(groupContainer);
                 });
             }
 
@@ -664,12 +877,16 @@
                 const grid = document.getElementById('stickers-grid');
                 grid.innerHTML = '';
                 eq.figuras.forEach((estado, index) => {
+                    // Validamos si es el jugador top (index 9), el escudo (index 0) o todos los institucionales
+                    const isSpecial = (eq.codigo === 'FWC') || (index === 0) || (index === 9);
+                    
                     const el = document.createElement('div');
-                    el.className = `sticker ${estado === 0 ? 'st-0' : (estado === 1 ? 'st-1' : 'st-rep')}`;
+                    el.className = `sticker ${estado === 0 ? 'st-0' : (estado === 1 ? 'st-1' : 'st-rep')} ${isSpecial ? 'holo-effect' : ''}`;
                     const imgPath = `imagenes/${eq.codigo}_${index + 1}.jpg`;
                     
                     el.innerHTML = `
                         <img src="${imgPath}" onerror="this.style.display='none';">
+                        ${isSpecial ? '<div class="holo-shine"></div>' : ''}
                         <span class="sticker-num">${index + 1}</span>
                         ${estado > 1 ? `<span class="sticker-badge">+${estado - 1}</span>` : ''}
                     `;
@@ -699,6 +916,116 @@
                     if(this.countdownInterval) clearInterval(this.countdownInterval);
                 }
             }
+
+            // --- SISTEMA DE CÓDIGOS PROMOCIONALES ---
+            
+            openPromoModal() {
+                document.getElementById('promo-input').value = '';
+                document.getElementById('promo-message').innerText = '';
+                document.getElementById('promo-modal').classList.add('active');
+            }
+
+            redeemPromo() {
+                const input = document.getElementById('promo-input').value.trim().toUpperCase();
+                const msg = document.getElementById('promo-message');
+                
+                if (!input) {
+                    msg.style.color = 'var(--text-muted)';
+                    msg.innerText = 'Escribe un código primero.';
+                    return;
+                }
+                
+                if (this.usedCodes.includes(input)) {
+                    msg.style.color = 'var(--wc-pink)';
+                    msg.innerText = '⚠️ Este código ya ha sido reclamado.';
+                    return;
+                }
+
+                if (input === 'GOAT') {
+                    this.usedCodes.push(input);
+                    this.saveData();
+                    this.closeModal('promo-modal');
+                    this.triggerEpicMessiReveal();
+                } else {
+                    msg.style.color = 'var(--wc-pink)';
+                    msg.innerText = '❌ Código inválido o expirado.';
+                }
+            }
+
+            async triggerEpicMessiReveal() {
+                let argTeam;
+                album.forEach(g => {
+                    const team = g.equipos.find(e => e.codigo === 'ARG');
+                    if (team) argTeam = team;
+                });
+
+                if(argTeam) {
+                    argTeam.figuras[9]++;
+                    this.logAction(`CÓDIGO CANJEADO (GOAT) - ARG #10 (Messi)`);
+                    this.saveData();
+                    this.renderDashboard();
+                }
+
+                const modal = document.getElementById('epic-modal');
+                const container = document.getElementById('epic-card-container');
+                const title = document.getElementById('epic-title');
+                const btnClose = document.getElementById('btn-close-epic');
+                
+                container.innerHTML = '';
+                title.style.opacity = '0';
+                title.innerText = 'Buscando al Elegido...';
+                btnClose.classList.add('hidden');
+                modal.classList.add('active');
+
+                audioHinchada.play().catch(e=>console.log(e));
+                
+                await new Promise(r => setTimeout(r, 2500));
+                
+                audioSilbato.play().catch(e=>console.log(e));
+                title.innerText = '¡EL GOAT!';
+                title.style.opacity = '1';
+
+                const imgPath = `imagenes/ARG_10.jpg`;
+                const card = document.createElement('div');
+                card.className = `pack-card goat-card`;
+                card.style.width = '200px';
+                card.style.height = '280px';
+                card.style.transform = 'translateY(100px) rotateY(180deg) scale(0.5)';
+                card.style.opacity = '0';
+                card.style.transition = 'all 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+                
+                card.innerHTML = `
+                    <img class="pack-img" src="${imgPath}" onerror="this.style.display='none';">
+                    <div class="pack-fallback" style="background: radial-gradient(circle, rgba(255,215,0,0.5) 0%, rgba(0,0,0,0.8) 100%);">
+                        <img src="audio/Messi.gif" style="width: 150px; height: 150px; object-fit: contain; filter: drop-shadow(0 0 15px gold);" alt="Messi">
+                    </div>
+                    <div class="pack-footer" style="background: rgba(255,215,0,0.25); border-top: 2px solid gold; justify-content: center;">
+                        <span class="card-team" style="color: gold; text-shadow: 0 2px 5px black; font-size: 1.6rem;">ARG - MESSI</span>
+                    </div>
+                `;
+                container.appendChild(card);
+
+                await new Promise(r => setTimeout(r, 500));
+                
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0) rotateY(0) scale(1)';
+                
+                setTimeout(() => {
+                    audioGol.play().catch(e=>console.log(e));
+                    this.createConfetti();
+                    setTimeout(() => this.createConfetti(), 500); 
+                    card.classList.add('epic-glow');
+                    btnClose.classList.remove('hidden');
+                }, 1300);
+            }
+
+            closeEpicModal() {
+                this.closeModal('epic-modal');
+                audioHinchada.pause();
+                audioHinchada.currentTime = 0;
+            }
+
+            // ------------------------------------------
 
             startCountdown(duration, textElement, onComplete, isMatch=false) {
                 if(this.countdownInterval) clearInterval(this.countdownInterval);
@@ -800,11 +1127,11 @@
                         }
 
                         if (win) {
-                            resultText.innerHTML = `¡${actualResult.toUpperCase()}! 🎉<br><span style="font-size:1.1rem; color:#A6A6AF;">¡Predicción perfecta!</span>`;
+                            resultText.innerHTML = `¡${actualResult.toUpperCase()}! 🎉<br><span style="font-size:1.1rem; color:#A6A6AF; font-family: sans-serif;">¡Predicción perfecta!</span>`;
                             resultText.style.color = 'var(--wc-green)';
                             document.getElementById('btn-pred-reward').classList.remove('hidden');
                         } else {
-                            resultText.innerHTML = `¡${actualResult.toUpperCase()}! 😢<br><span style="font-size:1.1rem; color:#A6A6AF;">Suerte la próxima vez.</span>`;
+                            resultText.innerHTML = `¡${actualResult.toUpperCase()}! 😢<br><span style="font-size:1.1rem; color:#A6A6AF; font-family: sans-serif;">Suerte la próxima vez.</span>`;
                             resultText.style.color = 'var(--wc-pink)';
                             document.getElementById('btn-pred-close').classList.remove('hidden');
                         }
@@ -902,12 +1229,12 @@
                     if (win) {
                         audioGol.play().catch(e=>console.log(e));
                         this.createConfetti();
-                        resText.innerHTML = `¡GANÓ EL EQUIPO ${actualWinner.toUpperCase()}! 🎉<br><span style="font-size:1.1rem; color:#A6A6AF;">¡Predicción perfecta!</span>`;
+                        resText.innerHTML = `¡GANÓ EL EQUIPO ${actualWinner.toUpperCase()}! 🎉<br><span style="font-size:1.1rem; color:#A6A6AF; font-family: sans-serif;">¡Predicción perfecta!</span>`;
                         resText.style.color = 'var(--wc-green)';
                         document.getElementById('btn-partido-reward').classList.remove('hidden');
                     } else {
                         audioUhhh.play().catch(e=>console.log(e));
-                        resText.innerHTML = `Ganó el equipo ${actualWinner.toUpperCase()} 😢<br><span style="font-size:1.1rem; color:#A6A6AF;">Suerte la próxima vez.</span>`;
+                        resText.innerHTML = `Ganó el equipo ${actualWinner.toUpperCase()} 😢<br><span style="font-size:1.1rem; color:#A6A6AF; font-family: sans-serif;">Suerte la próxima vez.</span>`;
                         resText.style.color = 'var(--wc-pink)';
                         document.getElementById('btn-partido-close').classList.remove('hidden');
                     }
@@ -932,7 +1259,7 @@
             }
 
             createConfetti() {
-                const container = document.getElementById('prediction-modal');
+                const container = document.querySelector('.modal.active') || document.body;
                 for (let i = 0; i < 60; i++) {
                     const conf = document.createElement('div');
                     conf.className = 'confetti';
@@ -968,13 +1295,17 @@
                     const esNueva = eqAleatorio.figuras[figAleatoria] === 0;
                     eqAleatorio.figuras[figAleatoria]++;
 
+                    // Validar si la figurita al azar es especial (Escudo, Jugador Top 10 o FWC)
+                    const isSpecial = (eqAleatorio.codigo === 'FWC') || (figAleatoria === 0) || (figAleatoria === 9);
+
                     const imgPath = `imagenes/${eqAleatorio.codigo}_${figAleatoria + 1}.jpg`;
 
                     const card = document.createElement('div');
-                    card.className = `pack-card ${esNueva ? 'new' : 'rep'}`;
+                    card.className = `pack-card ${esNueva ? 'new' : 'rep'} ${isSpecial ? 'holo-effect' : ''}`;
                     
                     card.innerHTML = `
                         <img class="pack-img" src="${imgPath}" onerror="this.style.display='none';">
+                        ${isSpecial ? '<div class="holo-shine"></div>' : ''}
                         <div class="pack-fallback">
                             <span class="card-num">${figAleatoria + 1}</span>
                         </div>
@@ -1030,12 +1361,12 @@
                     const card = document.createElement('div');
                     card.className = 'team-card';
                     card.innerHTML = `
-                        <div style="font-size: 4rem; font-weight: 900; color: rgba(128,128,128,0.1); position: absolute; top: -10px; right: 10px;">#${i+1}</div>
+                        <div style="font-size: 4rem; color: rgba(128,128,128,0.1); position: absolute; top: -10px; right: 10px;">#${i+1}</div>
                         <div class="card-header" style="margin-bottom: 0;">
-                            <h3 style="font-size: 1.5rem;">${eq.nombre}</h3><span class="card-code">${eq.codigo}</span>
+                            <h3 style="font-size: 1.6rem;">${eq.nombre}</h3><span class="card-code">${eq.codigo}</span>
                         </div>
                         <div class="progress-bar-container"><div class="progress-bar" style="width: ${eq.pct}%"></div></div>
-                        <div class="progress-text" style="color: var(--wc-green); font-size: 1.1rem;">${eq.pct.toFixed(1)}%</div>
+                        <div class="progress-text" style="color: var(--wc-green); font-size: 1.1rem; font-family: sans-serif;">${eq.pct.toFixed(1)}%</div>
                     `;
                     list.appendChild(card);
                 });
@@ -1046,7 +1377,7 @@
                 list.innerHTML = '';
                 
                 if (historial.length === 0) {
-                    list.innerHTML = '<p style="text-align: center; color: var(--text-muted);">El historial está vacío.</p>';
+                    list.innerHTML = '<p style="text-align: center; color: var(--text-muted); font-family: sans-serif;">El historial está vacío.</p>';
                 } else {
                     historial.forEach(h => {
                         const item = document.createElement('div');
@@ -1068,11 +1399,33 @@
             }
 
             resetAlbum() {
-                if (confirm("🚨 ¿ESTÁS SEGURO? Se borrará todo tu progreso de forma permanente.")) {
+                if (confirm("🚨 ¿ESTÁS SEGURO? Se borrarán TODAS las figuritas que hayas conseguido hasta ahora. (El historial se mantendrá).")) {
+                    localStorage.removeItem('album2026_oficial');
+                    localStorage.removeItem('album2026_codes');
+                    this.usedCodes = [];
+
+                    this.initializeAlbum();
+                    this.renderDashboard();
+                    document.getElementById('ranking-section').classList.add('hidden');
+                    document.getElementById('groups-section').classList.remove('hidden');
+                    
+                    this.logAction("PROGRESO DE FIGURITAS RESETEADO");
+                }
+            }
+
+            hardResetAlbum() {
+                if (confirm("☢️ PELIGRO: ¿VACIADO COMPLETO? Esto eliminará para siempre tus figuritas, todos tus códigos y TODO el historial de movimientos. Esta acción es irreversible.")) {
                     localStorage.removeItem('album2026_oficial');
                     localStorage.removeItem('album2026_historial');
-                    this.loadData();
+                    localStorage.removeItem('album2026_codes');
+                    
+                    historial = [];
+                    this.usedCodes = [];
+                    this.expandedGroups.clear();
+                    
+                    this.initializeAlbum();
                     this.renderDashboard();
+                    
                     document.getElementById('ranking-section').classList.add('hidden');
                     document.getElementById('groups-section').classList.remove('hidden');
                 }
