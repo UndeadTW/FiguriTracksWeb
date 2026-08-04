@@ -1,13 +1,11 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
+<head><script type="text/javascript" src="/___vscode_livepreview_injected_script"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Gestor del álbum del Mundial 2026 con figuritas, sobres, ranking y minijuegos.">
-    <meta name="theme-color" content="#040406">
-    <title>FiguriTracks Web | Álbum Mundial 2026</title>
+    <title>Gestor Álbum Mundial 2026</title>
     <style>
-       /* Importamos tu fuente personalizada */
+        /* Importamos tu fuente personalizada */
         @font-face {
             font-family: 'FWC2026';
             src: url('audio/FWC2026-UltraCondensedBlack.8e6ba053.ttf') format('truetype');
@@ -75,12 +73,8 @@
 
         body::before {
             content: ''; position: fixed; inset: 0;
-            z-index: -2; filter: saturate(1) contrast(1.03) brightness(0.9); transform: scale(1.05);
-            background-image: var(--body-overlay), url('./fifa-unveils-official-brand-for-2026-fifa-world-cup-header-image.avif');
-            background-position: center center;
-            background-size: cover;
-            background-repeat: no-repeat;
-            transition: background-image 0.4s ease;
+            background: var(--body-overlay), url('./fifa-unveils-official-brand-for-2026-fifa-world-cup-header-image.avif') center center / cover no-repeat;
+            z-index: -2; filter: saturate(1) contrast(1.03) brightness(0.9); transform: scale(1.05); transition: background 0.4s ease;
         }
 
         body::after {
@@ -467,7 +461,7 @@
             <div class="brand-text">
                 <h1>Fifa World Cup</h1>
                 <span>GESTOR OFICIAL</span>
-                <div style="margin-top: 0.3rem; font-size: 0.75rem; letter-spacing: 1.2px; color: var(--wc-green); text-transform: uppercase;">Actualización en vivo</div>
+                <div style="margin-top: 0.25rem; font-size: 0.74rem; letter-spacing: 1.2px; color: var(--wc-green); text-transform: uppercase;">Deploy actualizado</div>
             </div>
         </div>
         <div class="header-right">
@@ -631,8 +625,8 @@
     </div>
 
     <footer>
-        <p>Actualizado para el <strong>álbum del Mundial 2026</strong> con gestión de figuritas y minijuegos.</p>
-        <p style="margin-top: 5px; opacity: 0.7; font-size: 0.9rem;">Última actualización: 03/08/2026 · Deploy en GitHub Pages</p>
+        <p>Desarrollado por <strong>Lucas Lasciarrea</strong> | Técnico Informático </p>
+        <p style="margin-top: 5px; opacity: 0.75; font-size: 0.9rem;">Versión actualizada · GitHub Pages activo</p>
         <p style="margin-top: 5px; opacity: 0.5; font-size: 0.9rem;">Estética WE ARE 26 - FIFA World Cup</p>
     </footer>
 
@@ -667,54 +661,32 @@
             }, 100);
 
             startBtn.addEventListener('click', () => {
-    // 1. EL TRUCO: "Bendecimos" el video inmediatamente con el clic del usuario
-    // Esto le avisa a Chrome/Safari que el usuario interactuó con el medio.
-    const prePlay = introVideo.play();
-    if (prePlay !== undefined) {
-        prePlay.then(() => {
-            introVideo.pause();
-            introVideo.currentTime = 0;
-        }).catch(e => console.log("Pre-play bloqueado preventivamente:", e));
-    }
+                // Iniciar el fade out gradual de los elementos del inicio
+                startBtnContainer.style.opacity = '0';
+                introBg.style.opacity = '0';
 
-    // Iniciar el fade out gradual de los elementos del inicio
-    startBtnContainer.style.opacity = '0';
-    introBg.style.opacity = '0';
+                // Bajar el volumen del audio progresivamente durante 5 segundos
+                let vol = 1;
+                let fadeAudio = setInterval(() => {
+                    if (vol > 0.05) {
+                        vol -= 0.05;
+                        introAudio.volume = vol;
+                    } else {
+                        clearInterval(fadeAudio);
+                        introAudio.pause();
+                        introAudio.volume = 1; // restauramos volumen por si se usa de nuevo
+                    }
+                }, 250); // 250ms * 20 iteraciones = 5000ms (5 segundos)
 
-    // Bajar el volumen del audio progresivamente durante 5 segundos
-    let vol = 1;
-    let fadeAudio = setInterval(() => {
-        if (vol > 0.05) {
-            vol -= 0.05;
-            introAudio.volume = vol;
-        } else {
-            clearInterval(fadeAudio);
-            introAudio.pause();
-            introAudio.volume = 1; // restauramos volumen por si se usa de nuevo
-        }
-    }, 250); // 250ms * 20 iteraciones = 5000ms (5 segundos)
-
-    // Tras los 5 segundos de animación de salida, mostramos y reproducimos el video
-    setTimeout(() => {
-        startBtnContainer.style.display = 'none';
-        introBg.style.display = 'none';
-        
-        introVideo.style.display = 'block';
-        
-        // 2. EL RESPALDO: Manejamos el error si el navegador lo sigue bloqueando
-        const playPromise = introVideo.play();
-        if (playPromise !== undefined) {
-            playPromise.catch(error => {
-                console.warn('El navegador bloqueó el video por el retraso de 5 seg:', error);
-                
-                // Si el video falla, forzamos la salida de la pantalla de carga para que el usuario no se quede trabado
-                loadingScreen.style.transition = 'opacity 2s ease';
-                loadingScreen.style.opacity = '0';
-                setTimeout(() => { loadingScreen.style.display = 'none'; }, 2000);
+                // Tras los 5 segundos de animación de salida, mostramos y reproducimos el video
+                setTimeout(() => {
+                    startBtnContainer.style.display = 'none';
+                    introBg.style.display = 'none';
+                    
+                    introVideo.style.display = 'block';
+                    introVideo.play();
+                }, 5000);
             });
-        }
-    }, 5000);
-});
 
             introVideo.addEventListener('ended', () => {
                 loadingScreen.style.transition = 'opacity 2s ease';
@@ -770,9 +742,28 @@
             }
 
             loadData() {
-                const storedAlbum = localStorage.getItem('album2026_oficial');
-                if (storedAlbum) { album = JSON.parse(storedAlbum); } 
-                else { this.initializeAlbum(); }
+                try {
+                    const storedAlbum = localStorage.getItem('album2026_oficial');
+                    
+                    if (storedAlbum) { 
+                        const parsedAlbum = JSON.parse(storedAlbum);
+                        
+                        // VALIDACIÓN: Comprobamos si es una estructura vieja.
+                        // Si el primer elemento no tiene la propiedad 'equipos', 
+                        // sabemos que es un guardado corrupto/viejo y lo reseteamos.
+                        if (!parsedAlbum[0] || !parsedAlbum[0].equipos) {
+                            console.warn("Estructura antigua detectada en LocalStorage. Reseteando álbum...");
+                            this.initializeAlbum();
+                        } else {
+                            album = parsedAlbum; 
+                        }
+                    } else { 
+                        this.initializeAlbum(); 
+                    }
+                } catch (error) {
+                    console.error("Error crítico leyendo el LocalStorage. Reseteando...", error);
+                    this.initializeAlbum();
+                }
 
                 const storedHistorial = localStorage.getItem('album2026_historial');
                 if (storedHistorial) { historial = JSON.parse(storedHistorial); }
