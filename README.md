@@ -1,11 +1,11 @@
 # FiguriTracksWeb
 
-Proyecto web estático para gestionar un álbum del Mundial 2026 con sobre de figuritas, minijuegos, historial y ranking.
+Proyecto web estático para gestionar un álbum del Mundial 2026 con sobres de figuritas, minijuegos, historial y ranking.
 
 ## Ejecutar localmente
 
 Abre [index.html](index.html) en el navegador o sirve la carpeta con un servidor simple.
 
-## Publicación
+## Publicación en GitHub Pages
 
-Este sitio está preparado para publicarse en GitHub Pages desde la raíz del repositorio.
+El sitio está preparado para publicarse desde la raíz del repositorio y también incluye un flujo de GitHub Actions para desplegarlo automáticamente al hacer push en la rama main.

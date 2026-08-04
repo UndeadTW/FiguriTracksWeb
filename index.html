@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestor Álbum Mundial 2026</title>
+    <meta name="description" content="Gestor del álbum del Mundial 2026 con figuritas, sobres, ranking y minijuegos.">
+    <meta name="theme-color" content="#040406">
+    <title>FiguriTracks Web | Álbum Mundial 2026</title>
     <style>
         /* Importamos tu fuente personalizada */
         @font-face {
@@ -624,7 +626,7 @@
     </div>
 
     <footer>
-        <p>Desarrollado por <strong>Lucas Lasciarrea</strong> | Técnico Informático </p>
+        <p>Actualizado para el <strong>álbum del Mundial 2026</strong> con gestión de figuritas y minijuegos.</p>
         <p style="margin-top: 5px; opacity: 0.5; font-size: 0.9rem;">Estética WE ARE 26 - FIFA World Cup</p>
     </footer>
 
@@ -659,32 +661,54 @@
             }, 100);
 
             startBtn.addEventListener('click', () => {
-                // Iniciar el fade out gradual de los elementos del inicio
-                startBtnContainer.style.opacity = '0';
-                introBg.style.opacity = '0';
+    // 1. EL TRUCO: "Bendecimos" el video inmediatamente con el clic del usuario
+    // Esto le avisa a Chrome/Safari que el usuario interactuó con el medio.
+    const prePlay = introVideo.play();
+    if (prePlay !== undefined) {
+        prePlay.then(() => {
+            introVideo.pause();
+            introVideo.currentTime = 0;
+        }).catch(e => console.log("Pre-play bloqueado preventivamente:", e));
+    }
 
-                // Bajar el volumen del audio progresivamente durante 5 segundos
-                let vol = 1;
-                let fadeAudio = setInterval(() => {
-                    if (vol > 0.05) {
-                        vol -= 0.05;
-                        introAudio.volume = vol;
-                    } else {
-                        clearInterval(fadeAudio);
-                        introAudio.pause();
-                        introAudio.volume = 1; // restauramos volumen por si se usa de nuevo
-                    }
-                }, 250); // 250ms * 20 iteraciones = 5000ms (5 segundos)
+    // Iniciar el fade out gradual de los elementos del inicio
+    startBtnContainer.style.opacity = '0';
+    introBg.style.opacity = '0';
 
-                // Tras los 5 segundos de animación de salida, mostramos y reproducimos el video
-                setTimeout(() => {
-                    startBtnContainer.style.display = 'none';
-                    introBg.style.display = 'none';
-                    
-                    introVideo.style.display = 'block';
-                    introVideo.play();
-                }, 5000);
+    // Bajar el volumen del audio progresivamente durante 5 segundos
+    let vol = 1;
+    let fadeAudio = setInterval(() => {
+        if (vol > 0.05) {
+            vol -= 0.05;
+            introAudio.volume = vol;
+        } else {
+            clearInterval(fadeAudio);
+            introAudio.pause();
+            introAudio.volume = 1; // restauramos volumen por si se usa de nuevo
+        }
+    }, 250); // 250ms * 20 iteraciones = 5000ms (5 segundos)
+
+    // Tras los 5 segundos de animación de salida, mostramos y reproducimos el video
+    setTimeout(() => {
+        startBtnContainer.style.display = 'none';
+        introBg.style.display = 'none';
+        
+        introVideo.style.display = 'block';
+        
+        // 2. EL RESPALDO: Manejamos el error si el navegador lo sigue bloqueando
+        const playPromise = introVideo.play();
+        if (playPromise !== undefined) {
+            playPromise.catch(error => {
+                console.warn('El navegador bloqueó el video por el retraso de 5 seg:', error);
+                
+                // Si el video falla, forzamos la salida de la pantalla de carga para que el usuario no se quede trabado
+                loadingScreen.style.transition = 'opacity 2s ease';
+                loadingScreen.style.opacity = '0';
+                setTimeout(() => { loadingScreen.style.display = 'none'; }, 2000);
             });
+        }
+    }, 5000);
+});
 
             introVideo.addEventListener('ended', () => {
                 loadingScreen.style.transition = 'opacity 2s ease';
